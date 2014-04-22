@@ -20,10 +20,13 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec"
   spec.add_development_dependency "rack-test", "~> 0.6.2"
+  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "capybara"
 
+  spec.add_runtime_dependency "woyo-dsl"
   spec.add_runtime_dependency "sinatra", "~> 1.4.5"
   spec.add_runtime_dependency "sinatra-contrib", "~> 1.4.2"
+  spec.add_runtime_dependency "haml"
 
 end
