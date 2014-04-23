@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require_relative 'lib/woyo/server'
+require 'woyo/server'
 
 Woyo::WebServer.run!
 

@@ -10,21 +10,13 @@ class WebServer < Sinatra::Application
     set root: '.'
   end
 
+  def world
+    raise 'No world provided' unless settings.respond_to? :world
+    settings.world
+  end
+
   get '/' do
-    @location = Woyo::Location.new :home do
-      name 'Home'
-      description 'Where the heart is.'
-      way :out do
-        name 'Door'
-        description 'A sturdy wooden door, old fashioned farmhouse style of a bygone era.'
-        to :garden
-      end
-      way :down do
-        name 'Stairs'
-        description 'Rickety stairs lead down into darkness. A dank smell emanates from the darkness below'
-        to :cellar
-      end
-    end
+    @location = world.location :home
     haml :location
   end
 
