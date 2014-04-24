@@ -5,7 +5,7 @@ require 'woyo/server/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "woyo-server"
-  spec.version       = Woyo::Server::VERSION
+  spec.version       = Woyo::SERVER_VERSION
   spec.authors       = ["Gerard Fowley"]
   spec.email         = ["gerard.fowley@iqeo.net"]
   spec.summary       = %q{World of Your Own}
@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "capybara"
 
-  spec.add_runtime_dependency "woyo-dsl"
+  spec.add_runtime_dependency "woyo-world"
   spec.add_runtime_dependency "sinatra", "~> 1.4.5"
   spec.add_runtime_dependency "sinatra-contrib", "~> 1.4.2"
   spec.add_runtime_dependency "haml"

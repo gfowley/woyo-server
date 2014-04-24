@@ -1,7 +1,7 @@
 require 'spec_helper.rb'
-require 'woyo/server/server'
+require 'woyo/server'
 
-describe Woyo::Server::Server, :type => :feature do
+describe Woyo::Server, :type => :feature do
 
   before :all do
     @small_world = Woyo::World.new do
@@ -59,13 +59,13 @@ describe Woyo::Server::Server, :type => :feature do
   end
 
   it 'accepts a world' do
-    Woyo::Server::Server.set :world, @small_world
+    Woyo::Server.set :world, @small_world
     visit '/'
     status_code.should eq 200
   end
 
   it 'describes a location' do 
-    Woyo::Server::Server.set :world, @home_world
+    Woyo::Server.set :world, @home_world
     visit '/'
     page.should have_selector '.location#location_home'
     page.should have_selector '.location#location_home .name',                      text: 'Home'
@@ -79,7 +79,7 @@ describe Woyo::Server::Server, :type => :feature do
   end               
 
   it 'goes way to another location' do
-    Woyo::Server::Server.set :world, @home_world
+    Woyo::Server.set :world, @home_world
     visit '/'
     page.should have_selector '.location#location_home .way#way_out a#go_out'
     click_on 'go_out'
@@ -87,7 +87,7 @@ describe Woyo::Server::Server, :type => :feature do
   end
 
   it 'tracks location (go and come back)' do
-    Woyo::Server::Server.set :world, @home_world
+    Woyo::Server.set :world, @home_world
     visit '/'
     page.should have_selector '.location#location_home .name',                text: 'Home'
     page.should have_selector '.location#location_home .way#way_out a#go_out'
@@ -99,7 +99,7 @@ describe Woyo::Server::Server, :type => :feature do
   end
 
   it 'tracks location (loop both directions)' do
-    Woyo::Server::Server.set :world, @home_world
+    Woyo::Server.set :world, @home_world
     visit '/'
     page.should have_selector '.location#location_home .name',                text: 'Home'
     page.should have_selector '.location#location_home .way#way_out a#go_out'

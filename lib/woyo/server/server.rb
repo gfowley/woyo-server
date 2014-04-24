@@ -1,9 +1,8 @@
 require 'sinatra/base'
 require 'haml'
-require 'woyo/dsl'
+require 'woyo/world'
 
 module Woyo
-module Server
 
 class Server < Sinatra::Application
 
@@ -35,5 +34,4 @@ class Server < Sinatra::Application
   
 end
 
-end
 end

@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require 'woyo/dsl'
+require 'woyo/world'
 require 'woyo/server'
 
 @home_world = Woyo::World.new do
@@ -48,6 +48,6 @@ require 'woyo/server'
   end
 end
 
-Woyo::Server::Server.set :world, @home_world
-Woyo::Server::Server.run!
+Woyo::Server.set :world, @home_world
+Woyo::Server.run!
 
