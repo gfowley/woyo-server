@@ -4,6 +4,7 @@
 
   - @location.ways.each do |id,way|
     %div.way{ :id => "way_#{id}" }
-      %h3.name= way.name
-      %p.description= way.description
+      %a{ :id => "go_#{id}", :href => "/go/#{id}" }
+        %h3.name= way.name
+        %p.description= way.description
 

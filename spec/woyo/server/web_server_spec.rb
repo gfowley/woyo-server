@@ -3,24 +3,11 @@ require 'woyo/server'
 
 describe Woyo::WebServer, :type => :feature do
 
-  it 'requires a world' do
-    # run this before setting :world because setting.world becomes a class variable!?
-    #expect{ get '/' }.to raise_error
-    get '/'
-    last_response.should_not be_ok
-  end
-
-  it 'accepts a world' do
-    small_world = Woyo::World.new do
+  before :all do
+    @small_world = Woyo::World.new do
       location :small
     end
-    Woyo::WebServer.set :world, small_world
-    get '/'
-    last_response.should be_ok
-  end
-
-  it 'describes a location' do 
-    home_world = Woyo::World.new do
+    @home_world = Woyo::World.new do
       location :home do
         name 'Home'
         description 'Where the heart is.'
@@ -35,8 +22,30 @@ describe Woyo::WebServer, :type => :feature do
           to :cellar
         end
       end
+      location :garden do
+        name 'Garden'
+        description 'A peaceful green oasis of life in the midst of a gray city'
+        way :in do
+          name 'Door'
+          description 'Door leads inside a cute cottage'
+        end
+      end
     end
-    Woyo::WebServer.set :world, home_world
+  end
+
+  it 'requires a world' do
+    visit '/'
+    status_code.should eq 500
+  end
+
+  it 'accepts a world' do
+    Woyo::WebServer.set :world, @small_world
+    visit '/'
+    status_code.should eq 200
+  end
+
+  it 'describes a location' do 
+    Woyo::WebServer.set :world, @home_world
     visit '/'
     page.should have_selector '.location#location_home'
     page.should have_selector '.location#location_home .name',                      text: 'Home'
@@ -49,9 +58,12 @@ describe Woyo::WebServer, :type => :feature do
     page.should have_selector '.location#location_home .way#way_down .description', text: 'Rickety stairs lead down'
   end               
 
-  it 'can go ways to other locations' do
-    get '/'
-    pending 'capybara to click ways to other locations'
+  it 'can go way to another location' do
+    Woyo::WebServer.set :world, @home_world
+    visit '/'
+    page.should have_selector '.location#location_home .way#way_out a#go_out'
+    click_on 'go_out'
+    page.should have_selector '.location#location_garden .name', text: 'Garden'
   end
 
 end

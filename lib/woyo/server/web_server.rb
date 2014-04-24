@@ -20,8 +20,10 @@ class WebServer < Sinatra::Application
     haml :location
   end
 
-  get '/go/:way' do
+  get '/go/*' do |way|
     # way.to location (from current location)
+    @location = (world.location :home).ways[way.to_sym].to
+    haml :location
   end
 
   get '/action/:thing' do
