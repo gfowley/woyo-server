@@ -1,7 +1,7 @@
 #! /usr/bin/env ruby
 
 require 'woyo/dsl'
-require_relative '../lib/woyo/server'
+require 'woyo/server'
 
 @home_world = Woyo::World.new do
   location :home do
@@ -48,6 +48,6 @@ require_relative '../lib/woyo/server'
   end
 end
 
-Woyo::WebServer.set :world, @home_world
-Woyo::WebServer.run!
+Woyo::Server::Server.set :world, @home_world
+Woyo::Server::Server.run!
 

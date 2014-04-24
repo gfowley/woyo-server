@@ -3,8 +3,9 @@ require 'haml'
 require 'woyo/dsl'
 
 module Woyo
+module Server
 
-class WebServer < Sinatra::Application
+class Server < Sinatra::Application
 
   configure do
     set root: '.'
@@ -34,4 +35,5 @@ class WebServer < Sinatra::Application
   
 end
 
+end
 end
