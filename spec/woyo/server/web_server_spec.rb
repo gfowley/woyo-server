@@ -1,11 +1,13 @@
 require 'spec_helper.rb'
 require 'woyo/server'
 
-describe Woyo::WebServer do
+describe Woyo::WebServer, :type => :feature do
 
   it 'requires a world' do
     # run this before setting :world because setting.world becomes a class variable!?
-    expect{ get '/' }.to raise_error
+    #expect{ get '/' }.to raise_error
+    get '/'
+    last_response.should_not be_ok
   end
 
   it 'accepts a world' do
@@ -17,7 +19,7 @@ describe Woyo::WebServer do
     last_response.should be_ok
   end
 
-  it 'describes a location' do
+  it 'describes a location' do 
     home_world = Woyo::World.new do
       location :home do
         name 'Home'
@@ -35,19 +37,16 @@ describe Woyo::WebServer do
       end
     end
     Woyo::WebServer.set :world, home_world
-    get '/'
-    (last_response.body =~ /id='location_home'/).should be_true
-    (last_response.body =~ /class='location'/).should be_true
-    (last_response.body =~ /class='name'/).should be_true
-    (last_response.body =~ /class='description'/).should be_true
-    (last_response.body =~ /id='way_out'/).should be_true
-    (last_response.body =~ /class='way'/).should be_true
-    (last_response.body =~ /class='name'/).should be_true
-    (last_response.body =~ /class='description'/).should be_true
-    (last_response.body =~ /id='way_down'/).should be_true
-    (last_response.body =~ /class='way'/).should be_true
-    (last_response.body =~ /class='name'/).should be_true
-    (last_response.body =~ /class='description'/).should be_true
+    visit '/'
+    page.should have_selector '.location#location_home'
+    page.should have_selector '.location#location_home .name',                      text: 'Home'
+    page.should have_selector '.location#location_home .description',               text: 'Where the heart is.'
+    page.should have_selector '.location#location_home .way#way_out'
+    page.should have_selector '.location#location_home .way#way_out .name',         text: 'Door'
+    page.should have_selector '.location#location_home .way#way_out .description',  text: 'A sturdy wooden door'
+    page.should have_selector '.location#location_home .way#way_down'
+    page.should have_selector '.location#location_home .way#way_down .name',        text: 'Stairs'
+    page.should have_selector '.location#location_home .way#way_down .description', text: 'Rickety stairs lead down'
   end               
 
   it 'can go ways to other locations' do
