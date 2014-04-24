@@ -28,6 +28,26 @@ describe Woyo::WebServer, :type => :feature do
         way :in do
           name 'Door'
           description 'Door leads inside a cute cottage'
+          to :home
+        end
+        way :down do
+          name 'Bulkhead'
+          description 'Rusty bulkhead door and stairs'
+          to :cellar
+        end
+      end
+      location :cellar do
+        name 'Cellar'
+        description 'Dark and damp, full of shadows and strange sounds'
+        way :out do
+          name 'Bulkhead'
+          description 'Rusty bulkhead stairs and door'
+          to :garden
+        end
+        way :up do
+          name 'Stairs'
+          description 'Rickety stairs lead up into light'
+          to :home
         end
       end
     end
@@ -58,12 +78,48 @@ describe Woyo::WebServer, :type => :feature do
     page.should have_selector '.location#location_home .way#way_down .description', text: 'Rickety stairs lead down'
   end               
 
-  it 'can go way to another location' do
+  it 'goes way to another location' do
     Woyo::WebServer.set :world, @home_world
     visit '/'
     page.should have_selector '.location#location_home .way#way_out a#go_out'
     click_on 'go_out'
     page.should have_selector '.location#location_garden .name', text: 'Garden'
+  end
+
+  it 'tracks location (go and come back)' do
+    Woyo::WebServer.set :world, @home_world
+    visit '/'
+    page.should have_selector '.location#location_home .name',                text: 'Home'
+    page.should have_selector '.location#location_home .way#way_out a#go_out'
+    click_on 'go_out'
+    page.should have_selector '.location#location_garden .name',              text: 'Garden'
+    page.should have_selector '.location#location_garden .way#way_in a#go_in'
+    click_on 'go_in'
+    page.should have_selector '.location#location_home .name',                text: 'Home'
+  end
+
+  it 'tracks location (loop both directions)' do
+    Woyo::WebServer.set :world, @home_world
+    visit '/'
+    page.should have_selector '.location#location_home .name',                text: 'Home'
+    page.should have_selector '.location#location_home .way#way_out a#go_out'
+    click_on 'go_out'
+    page.should have_selector '.location#location_garden .name',              text: 'Garden'
+    page.should have_selector '.location#location_garden .way#way_down a#go_down'
+    click_on 'go_down'
+    page.should have_selector '.location#location_cellar .name',              text: 'Cellar'
+    page.should have_selector '.location#location_cellar .way#way_up a#go_up'
+    click_on 'go_up'
+    page.should have_selector '.location#location_home .name',                text: 'Home'
+    page.should have_selector '.location#location_home .way#way_down a#go_down'
+    click_on 'go_down'
+    page.should have_selector '.location#location_cellar .name',              text: 'Cellar'
+    page.should have_selector '.location#location_cellar .way#way_out a#go_out'
+    click_on 'go_out'
+    page.should have_selector '.location#location_garden .name',              text: 'Garden'
+    page.should have_selector '.location#location_garden .way#way_in a#go_in'
+    click_on 'go_in'
+    page.should have_selector '.location#location_home .name',                text: 'Home'
   end
 
 end

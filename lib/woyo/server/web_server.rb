@@ -8,6 +8,7 @@ class WebServer < Sinatra::Application
 
   configure do
     set root: '.'
+    enable :sessions
   end
 
   def world
@@ -17,19 +18,20 @@ class WebServer < Sinatra::Application
 
   get '/' do
     @location = world.location :home
+    session[:location] = @location
     haml :location
   end
 
   get '/go/*' do |way|
-    # way.to location (from current location)
-    @location = (world.location :home).ways[way.to_sym].to
+    @location = session[:location].ways[way.to_sym].to
+    session[:location] = @location
     haml :location
   end
 
-  get '/action/:thing' do
-    # default action on thing
+  get '/do/*/*?/*?' do |item,action,tool|
+    # do default or optional action on required item with optional tool
   end
-
+  
 end
 
 end
