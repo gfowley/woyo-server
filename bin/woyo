@@ -3,6 +3,10 @@
 require 'woyo/world'
 require 'woyo/server'
 
+exit Woyo::Runner.run ARGV
+
+=begin
+
 @home_world = Woyo::World.new do
   location :home do
     name 'Home'
@@ -50,4 +54,6 @@ end
 
 Woyo::Server.set :world, @home_world
 Woyo::Server.run!
+ 
+=end
 
