@@ -60,7 +60,7 @@ class Runner
       end
     end
     [ 'public', 'views', 'world' ].each do |subdir|
-      FileUtils.mkdir_p File.join( dir, subdir )
+      FileUtils.cp_r File.join( __dir__, '../../', subdir, '.' ), dir
     end
     return 0
   end

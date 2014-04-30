@@ -35,10 +35,7 @@ describe Woyo::Runner do
   context 'new' do
 
     before :all do
-      # @original_path = Dir.pwd
-      # File.basename(@original_path).should eq 'woyo-server'
-      # @test_dir = 'tmp/test'
-      @expected_entries = [ '.', '..', 'public', 'views', 'world' ]
+      @expected_entries = [ 'public', 'views', 'world' ]
     end
 
     before :each do
@@ -62,8 +59,18 @@ describe Woyo::Runner do
       [['new','testworld'],['new','test/testworld']].each do |args|
         Woyo::Runner.run( args, out: @output, err: @error ).should eq 0
         Dir.should exist args[1]
-        Dir.entries(args[1]).sort.should eq @expected_entries
+        (Dir.entries(args[1]) & @expected_entries).sort.should eq @expected_entries
       end
+    end
+
+    it 'populates directories' do
+        Woyo::Runner.run( ['new','testworld'], out: @output, err: @error ).should eq 0
+        @expected_entries.each do |dir|
+          dir_entries = Dir.entries(File.join('testworld',dir)).sort
+          dir_entries.count.should be > 2
+          original_entries = Dir.entries(File.join(@original_path,dir)).sort
+          (dir_entries & original_entries).should eq original_entries 
+        end
     end
 
     it 'requires force (-f/--force) for existing directory' do
@@ -111,21 +118,13 @@ describe Woyo::Runner do
     end
 
     it 'starts a world application server' do
-      File.open 'world/test.rb','w' do |f|
-        f.puts "
-          location :home do
-            name 'Home'
-            desciption 'No place like'
-          end
-        "
-      end
       thread = Thread.new { Woyo::Runner.run( ['server'], out: @output, err: @error ) }
       thread.should be_alive
       sleep 2 
       @error.string.should include 'has taken the stage'
+      #sleep 120
       expect { page = open("http://127.0.0.1:4567/").read }.to_not raise_error
       page.should include 'Home'
-      page.should include 'No place like'
       Woyo::Server.stop!
       thread.join
     end

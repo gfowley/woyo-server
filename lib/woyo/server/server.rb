@@ -6,9 +6,18 @@ module Woyo
 
 class Server < Sinatra::Application
 
+  def self.load_world
+    world = Woyo::World.new
+    Dir['world/*.rb'].each do |filename|
+      world.instance_eval File.read filename
+    end
+    world
+  end
+
   configure do
-    set root: '.'
     enable :sessions
+    set root: '.'
+    set world: self.load_world
   end
 
   def world
