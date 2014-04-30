@@ -1,7 +1,6 @@
 #! /usr/bin/env ruby
 
-require 'woyo/world'
-require 'woyo/server'
+require_relative '../lib/woyo/runner'
 
 exit Woyo::Runner.run ARGV
 

@@ -1,5 +1,5 @@
 require 'spec_helper.rb'
-require 'woyo/server'
+require_relative '../../../lib/woyo/server'
 
 describe Woyo::Server, :type => :feature do
 

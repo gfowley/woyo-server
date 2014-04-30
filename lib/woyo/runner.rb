@@ -1,4 +1,5 @@
 require_relative 'server'
+require 'logger'
 
 module Woyo
 
@@ -9,6 +10,8 @@ class Runner
     @args = args.dup
     @out = out
     @err = err
+    $stderr = @err if @err
+    $stdout = @out if @out
 
     code = case @args.first
       when 'new'     then mode_new
@@ -63,9 +66,19 @@ class Runner
   end
 
   def self.mode_server
+    if @args.include?('-h') || @args.include?('--help')
+      print_help_server
+      return 0
+    end
+    Woyo::Server.run!
+    return 0
   end
 
   def self.mode_console
+    if @args.include?('-h') || @args.include?('--help')
+      print_help_console
+      return 0
+    end
   end
 
   def self.print_help
@@ -78,6 +91,22 @@ class Runner
 
   def self.print_help_new
     @err.puts "Usage: woyo new ..."
+    @err.puts
+    @err.puts "............."
+    @err.puts "............."
+    @err.puts "............."
+  end
+
+  def self.print_help_server
+    @err.puts "Usage: woyo server ..."
+    @err.puts
+    @err.puts "............."
+    @err.puts "............."
+    @err.puts "............."
+  end
+
+  def self.print_help_console
+    @err.puts "Usage: woyo console ..."
     @err.puts
     @err.puts "............."
     @err.puts "............."

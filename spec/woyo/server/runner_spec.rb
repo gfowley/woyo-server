@@ -1,29 +1,19 @@
-require 'woyo/runner'
+require_relative '../../../lib/woyo/runner'
 require 'fileutils'
 require 'stringio'
+require 'open-uri'
 
 describe Woyo::Runner do
+
+  before :each do
+    @output = StringIO.new
+    @error  = StringIO.new
+  end
 
   before :all do
     @original_path = Dir.pwd
     File.basename(@original_path).should eq 'woyo-server'
     @test_dir = 'tmp/test'
-    @expected_entries = [ '.', '..', 'public', 'views', 'world' ]
-  end
-
-  before :each do
-    Dir.pwd.should eq @original_path
-    FileUtils.rm_rf @test_dir
-    FileUtils.mkdir_p @test_dir
-    Dir.chdir @test_dir
-    Dir.pwd.should eq File.join( @original_path, @test_dir )
-    @output = StringIO.new
-    @error  = StringIO.new                 
-  end
-
-  after :each do
-    Dir.chdir @original_path
-    Dir.pwd.should eq @original_path
   end
 
   it 'prints a helpful message to stderr for help (-h/--help) switch' do
@@ -42,48 +32,124 @@ describe Woyo::Runner do
     end
   end
 
-  it 'new <dir> command creates a world application directory' do
-    [['new','testworld'],['new','test/testworld']].each do |args|
-      Woyo::Runner.run( args, out: @output, err: @error ).should eq 0
-      Dir.should exist args[1]
-      Dir.entries(args[1]).sort.should eq @expected_entries
+  context 'new' do
+
+    before :all do
+      # @original_path = Dir.pwd
+      # File.basename(@original_path).should eq 'woyo-server'
+      # @test_dir = 'tmp/test'
+      @expected_entries = [ '.', '..', 'public', 'views', 'world' ]
     end
-  end
 
-  it 'new command requires a directory be specified' do
-    Woyo::Runner.run( ['new'], out: @output, err: @error ).should eq -1
-  end
+    before :each do
+      Dir.pwd.should eq @original_path
+      FileUtils.rm_rf @test_dir
+      FileUtils.mkdir_p @test_dir
+      Dir.chdir @test_dir
+      Dir.pwd.should eq File.join( @original_path, @test_dir )
+    end
 
-  it 'new <dir> requires force (-f/--force) for existing directory' do
-    [['new','testworld'],['new','test/testworld'],['new','.']].each do |args|
-      dir = args[1]
-      FileUtils.mkdir_p dir
-      Dir.should exist dir
-      Woyo::Runner.run( args, out: @output, err: @error ).should eq -2
-      [['--force'],['-f']].each do |force|
-        FileUtils.mkdir_p dir
-        Dir.should exist dir
-        Woyo::Runner.run( args + force, out: @output, err: @error ).should eq 0
-        Dir.should exist dir
-        (Dir.entries(dir) & @expected_entries).sort.should eq @expected_entries      # subset
-        FileUtils.rm_rf dir
+    after :each do
+      Dir.chdir @original_path
+      Dir.pwd.should eq @original_path
+    end
+
+    it 'requires a directory be specified' do
+      Woyo::Runner.run( ['new'], out: @output, err: @error ).should eq -1
+    end
+
+    it 'creates a world application directory' do
+      [['new','testworld'],['new','test/testworld']].each do |args|
+        Woyo::Runner.run( args, out: @output, err: @error ).should eq 0
+        Dir.should exist args[1]
+        Dir.entries(args[1]).sort.should eq @expected_entries
       end
     end
-  end
 
-  it 'new command + help (-h/--help) explains new command' do
-    [['-h'],['--help']].each do |help|
-      Woyo::Runner.run( ['new'] + help, out: @output, err: @error ).should eq 0
-      @error.string.should include 'woyo new'
+    it 'requires force (-f/--force) for existing directory' do
+      [['new','testworld'],['new','test/testworld'],['new','.']].each do |args|
+        dir = args[1]
+        FileUtils.mkdir_p dir
+        Dir.should exist dir
+        Woyo::Runner.run( args, out: @output, err: @error ).should eq -2
+        [['--force'],['-f']].each do |force|
+          FileUtils.mkdir_p dir
+          Dir.should exist dir
+          Woyo::Runner.run( args + force, out: @output, err: @error ).should eq 0
+          Dir.should exist dir
+          (Dir.entries(dir) & @expected_entries).sort.should eq @expected_entries      # subset
+          FileUtils.rm_rf dir
+        end                                     
+      end
     end
+
+    it 'help (-h/--help) explains new command' do
+      [['-h'],['--help']].each do |help|
+        Woyo::Runner.run( ['new'] + help, out: @output, err: @error ).should eq 0
+        @error.string.should include 'woyo new'
+      end
+    end
+
   end
 
-  it 'server command starts a world application server'
+  context 'server' do
 
-  it 'server command + help (-h/--help) explains server command'
+    before :all do
+      Dir.pwd.should eq @original_path
+      FileUtils.rm_rf @test_dir
+      FileUtils.mkdir_p @test_dir
+      Dir.chdir @test_dir
+      Dir.pwd.should eq File.join( @original_path, @test_dir )
+      Woyo::Runner.run( ['new','testworld'], out: @output, err: @error ).should eq 0
+      Dir.chdir 'testworld'
+      Dir.pwd.should eq File.join( @original_path, @test_dir, 'testworld' )
+    end
 
-  it 'console command starts a world application conosle'
+    after :all do
+      Dir.chdir @original_path
+      Dir.pwd.should eq @original_path
+    end
 
-  it 'console command + help (-h/--help) explains console command'
+    it 'starts a world application server' do
+      File.open 'world/test.rb','w' do |f|
+        f.puts "
+          location :home do
+            name 'Home'
+            desciption 'No place like'
+          end
+        "
+      end
+      thread = Thread.new { Woyo::Runner.run( ['server'], out: @output, err: @error ) }
+      thread.should be_alive
+      sleep 2 
+      @error.string.should include 'has taken the stage'
+      expect { page = open("http://127.0.0.1:4567/").read }.to_not raise_error
+      page.should include 'Home'
+      page.should include 'No place like'
+      Woyo::Server.stop!
+      thread.join
+    end
+
+    it 'help (-h/--help) explains server command' do
+      [['-h'],['--help']].each do |help|
+        Woyo::Runner.run( ['server'] + help, out: @output, err: @error ).should eq 0
+        @error.string.should include 'woyo server'
+      end
+    end
+
+  end
+
+  context 'console' do
+
+    it 'starts a world application console'
+
+    it 'help (-h/--help) explains console command' do
+      [['-h'],['--help']].each do |help|
+        Woyo::Runner.run( ['console'] + help, out: @output, err: @error ).should eq 0
+        @error.string.should include 'woyo console'
+      end
+    end
+
+  end
 
 end
