@@ -1,5 +1,5 @@
-require 'spec_helper.rb'
 require_relative '../../../lib/woyo/server'
+require 'spec_helper.rb'
 
 describe Woyo::Server, :type => :feature do
 
@@ -53,9 +53,12 @@ describe Woyo::Server, :type => :feature do
     end
   end
 
-  it 'requires a world' do
+  it 'displays a welcome page if there is no world' do
+    # this must be the first test so that Woyo::Server.setting.world is not set
+    # that is why this file is name 1_server_spec.rb
     visit '/'
-    status_code.should eq 500
+    status_code.should eq 200
+    page.should have_content 'Welcome'
   end
 
   it 'accepts a world' do

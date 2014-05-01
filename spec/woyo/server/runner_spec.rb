@@ -122,7 +122,8 @@ describe Woyo::Runner do
       thread.should be_alive
       sleep 2 
       @error.string.should include 'has taken the stage'
-      #sleep 120
+      Woyo::Server.set :world, Woyo::World.new { location(:home) { name 'Home' } }
+      page = ''
       expect { page = open("http://127.0.0.1:4567/").read }.to_not raise_error
       page.should include 'Home'
       Woyo::Server.stop!

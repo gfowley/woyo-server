@@ -21,12 +21,12 @@ class Server < Sinatra::Application
   end
 
   def world
-    raise 'No world provided' unless settings.respond_to? :world
     settings.world
   end
 
   get '/' do
-    @location = world.location :home
+    redirect to '/default.html' if world.locations.empty?
+    @location ||= world.locations[:home] || world.locations.values.first
     session[:location] = @location
     haml :location
   end
