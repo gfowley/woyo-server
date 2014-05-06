@@ -8,6 +8,7 @@ describe Woyo::Server, :type => :feature do
       location :small
     end
     @home_world = Woyo::World.new do
+      start :home
       location :home do
         name 'Home'
         description 'Where the heart is.'
@@ -69,13 +70,21 @@ describe Woyo::Server, :type => :feature do
     page.should have_link 'a', href: 'https://github.com/iqeo/woyo-server/wiki'
   end
 
-  it 'accepts a world' do
+  it 'accepts a world (without start - display welcome)' do
+    Woyo::Server.set :world, @small_world
+    visit '/'
+    status_code.should eq 200
+    page.should have_content 'Welcome'
+  end
+
+  it 'accepts a world (with start)' do
+    @small_world.start = :small
     Woyo::Server.set :world, @small_world
     visit '/'
     status_code.should eq 200
   end
 
-  it 'describes a location' do 
+  it 'describes the start location' do 
     Woyo::Server.set :world, @home_world
     visit '/'
     page.should have_selector '.location#location_home'
@@ -88,8 +97,6 @@ describe Woyo::Server, :type => :feature do
     page.should have_selector '.location#location_home .way#way_down .name',        text: 'Stairs'
     page.should have_selector '.location#location_home .way#way_down .description', text: 'Rickety stairs lead down'
   end               
-
-  it 'defaults to the start location'
 
   it 'uses foundation stylesheets'
 
