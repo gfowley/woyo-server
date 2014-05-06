@@ -141,15 +141,27 @@ describe Woyo::Runner do
 
   context 'console' do
 
-    it 'starts a world application console'
+    # it 'starts a world application console'
 
-    it 'help (-h/--help) explains console command' do
+    # it 'help (-h/--help) explains console command' do
+    #   [['-h'],['--help']].each do |help|
+    #     Woyo::Runner.run( ['console'] + help, out: @output, err: @error ).should eq 0
+    #     @error.string.should include 'woyo console'
+    #   end
+    # end
+
+  end
+
+  context 'update' do
+
+    it 'updates a world application directory'
+
+    it 'help (-h/--help) explains update command' do
       [['-h'],['--help']].each do |help|
-        Woyo::Runner.run( ['console'] + help, out: @output, err: @error ).should eq 0
-        @error.string.should include 'woyo console'
+        Woyo::Runner.run( ['update'] + help, out: @output, err: @error ).should eq 0
+        @error.string.should include 'woyo update'
       end
     end
 
   end
-
 end

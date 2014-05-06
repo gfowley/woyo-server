@@ -53,12 +53,20 @@ describe Woyo::Server, :type => :feature do
     end
   end
 
-  it 'displays a welcome page if there is no world' do
-    # this must be the first test so that Woyo::Server.setting.world is not set
-    # that is why this file is name 1_server_spec.rb
+  # these must be the first tests so that Woyo::Server.setting.world is not set
+  # that is why this file is name 1_server_spec.rb
+
+  it 'welcome page is displayed if there is no world' do
     visit '/'
     status_code.should eq 200
     page.should have_content 'Welcome'
+  end
+
+  it 'welcome page links to github docs' do
+    visit '/'
+    status_code.should eq 200
+    page.should have_link 'a', href: 'https://github.com/iqeo/woyo-world/wiki'
+    page.should have_link 'a', href: 'https://github.com/iqeo/woyo-server/wiki'
   end
 
   it 'accepts a world' do
@@ -80,6 +88,12 @@ describe Woyo::Server, :type => :feature do
     page.should have_selector '.location#location_home .way#way_down .name',        text: 'Stairs'
     page.should have_selector '.location#location_home .way#way_down .description', text: 'Rickety stairs lead down'
   end               
+
+  it 'defaults to the start location'
+
+  it 'uses foundation stylesheets'
+
+  it 'uses jquery javascript'
 
   it 'goes way to another location' do
     Woyo::Server.set :world, @home_world
