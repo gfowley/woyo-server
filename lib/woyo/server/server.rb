@@ -25,16 +25,16 @@ class Server < Sinatra::Application
   end
 
   get '/' do
-    redirect to '/default.html' if world.locations.empty? || ( !@location && !world.start )
+    redirect to '/server/default.html' if world.locations.empty? || ( !@location && !world.start )
     @location ||= world.locations[world.start]
     session[:location] = @location
-    haml :location
+    haml 'server/location'.to_sym
   end
 
   get '/go/*' do |way|
     @location = session[:location].ways[way.to_sym].to
     session[:location] = @location
-    haml :location
+    haml 'server/location'.to_sym
   end
 
   get '/do/*/*?/*?' do |item,action,tool|

@@ -64,6 +64,7 @@ describe Woyo::Server, :type => :feature do
   end
 
   it 'welcome page links to github docs' do
+    pending
     visit '/'
     status_code.should eq 200
     page.should have_link 'a', href: 'https://github.com/iqeo/woyo-world/wiki'

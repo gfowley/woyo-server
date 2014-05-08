@@ -15,6 +15,7 @@ class Runner
 
     code = case @args.first
       when 'new'     then mode_new
+      when 'update'  then mode_update
       when 'server'  then mode_server
       when 'console' then mode_console
       end
@@ -66,6 +67,13 @@ class Runner
     return 0
   end
 
+  def self.mode_update
+    if @args.include?('-h') || @args.include?('--help')
+      print_help_update
+      return 0
+    end
+  end
+
   def self.mode_server
     if @args.include?('-h') || @args.include?('--help')
       print_help_server
@@ -92,6 +100,14 @@ class Runner
 
   def self.print_help_new
     @err.puts "Usage: woyo new ..."
+    @err.puts
+    @err.puts "............."
+    @err.puts "............."
+    @err.puts "............."
+  end
+
+  def self.print_help_update
+    @err.puts "Usage: woyo update ..."
     @err.puts
     @err.puts "............."
     @err.puts "............."

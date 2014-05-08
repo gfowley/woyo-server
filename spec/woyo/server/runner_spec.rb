@@ -36,6 +36,16 @@ describe Woyo::Runner do
 
     before :all do
       @expected_entries = [ 'public', 'views', 'world' ]
+      @contents = {
+        '.'             => %w( . .. world views public ),
+        'world'         => %w( . .. ),
+        'views'         => %w( . .. app server ),
+        'views/app'     => %w( . .. ),
+        'views/server'  => %w( . .. layout.haml location.haml ),
+        'public'        => %w( . .. app server ),
+        'public/app'    => %w( . .. html images js css ),
+        'public/server' => %w( . .. default.html foundation foundation-5.2.2 jquery jquery-2.1.1 ),
+      }
     end
 
     before :each do
@@ -56,21 +66,18 @@ describe Woyo::Runner do
     end
 
     it 'creates a world application directory' do
-      [['new','testworld'],['new','test/testworld']].each do |args|
-        Woyo::Runner.run( args, out: @output, err: @error ).should eq 0
-        Dir.should exist args[1]
-        (Dir.entries(args[1]) & @expected_entries).sort.should eq @expected_entries
+      [['new','testworld'],['new','test/testworld']].each do |cmd,dir|
+        Woyo::Runner.run( [cmd,dir], out: @output, err: @error ).should eq 0
+        Dir.should exist dir
+        Dir.entries(dir).sort.should eq @contents['.'].sort
       end
     end
 
     it 'populates directories' do
-        Woyo::Runner.run( ['new','testworld'], out: @output, err: @error ).should eq 0
-        @expected_entries.each do |dir|
-          dir_entries = Dir.entries(File.join('testworld',dir)).sort
-          dir_entries.count.should be > 2
-          original_entries = Dir.entries(File.join(@original_path,dir)).sort
-          (dir_entries & original_entries).should eq original_entries 
-        end
+      Woyo::Runner.run( ['new','testworld'], out: @output, err: @error ).should eq 0
+      @contents.each do |dir,contents|
+        Dir.entries(File.join('testworld',dir)).sort.should eq contents.sort
+      end
     end
 
     it 'requires force (-f/--force) for existing directory' do
@@ -122,7 +129,7 @@ describe Woyo::Runner do
       thread.should be_alive
       sleep 2 
       @error.string.should include 'has taken the stage'
-      Woyo::Server.set :world, Woyo::World.new { location(:home) { name 'Home' } }
+      Woyo::Server.set :world, Woyo::World.new { start :home ; location(:home) { name 'Home' } }
       page = ''
       expect { page = open("http://127.0.0.1:4567/").read }.to_not raise_error
       page.should include 'Home'
