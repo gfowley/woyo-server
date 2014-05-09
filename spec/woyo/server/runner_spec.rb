@@ -3,6 +3,9 @@ require 'fileutils'
 require 'stringio'
 require 'open-uri'
 
+STDERR.sync = true
+STDERR.sync = true
+
 describe Woyo::Runner do
 
   before :each do
@@ -11,6 +14,17 @@ describe Woyo::Runner do
   end
 
   before :all do
+    @expected_entries = [ 'public', 'views', 'world' ]
+    @contents = {
+      '.'             => %w( . .. world views public ),
+      'world'         => %w( . .. ),
+      'views'         => %w( . .. app server ),
+      'views/app'     => %w( . .. ),
+      'views/server'  => %w( . .. layout.haml location.haml ),
+      'public'        => %w( . .. app server ),
+      'public/app'    => %w( . .. html images js css ),
+      'public/server' => %w( . .. default.html foundation foundation-5.2.2 jquery jquery-2.1.1 ),
+    }
     @original_path = Dir.pwd
     File.basename(@original_path).should eq 'woyo-server'
     @test_dir = 'tmp/test'
@@ -33,20 +47,6 @@ describe Woyo::Runner do
   end
 
   context 'new' do
-
-    before :all do
-      @expected_entries = [ 'public', 'views', 'world' ]
-      @contents = {
-        '.'             => %w( . .. world views public ),
-        'world'         => %w( . .. ),
-        'views'         => %w( . .. app server ),
-        'views/app'     => %w( . .. ),
-        'views/server'  => %w( . .. layout.haml location.haml ),
-        'public'        => %w( . .. app server ),
-        'public/app'    => %w( . .. html images js css ),
-        'public/server' => %w( . .. default.html foundation foundation-5.2.2 jquery jquery-2.1.1 ),
-      }
-    end
 
     before :each do
       Dir.pwd.should eq @original_path
@@ -91,9 +91,19 @@ describe Woyo::Runner do
           Dir.should exist dir
           Woyo::Runner.run( args + force, out: @output, err: @error ).should eq 0
           Dir.should exist dir
-          (Dir.entries(dir) & @expected_entries).sort.should eq @expected_entries      # subset
+          (Dir.entries(dir) & @expected_entries).sort.should eq @expected_entries
           FileUtils.rm_rf dir
         end                                     
+      end
+    end
+
+    it 'refuses for existing file' do
+      [['new','testworld'],['new','test/testworld']].each do |args|
+        dir = args[1]
+        FileUtils.mkdir_p File.dirname(dir)
+        FileUtils.touch dir 
+        File.should exist dir
+        Woyo::Runner.run( args, out: @output, err: @error ).should eq -3
       end
     end
 
@@ -116,12 +126,23 @@ describe Woyo::Runner do
       Dir.pwd.should eq File.join( @original_path, @test_dir )
       Woyo::Runner.run( ['new','testworld'], out: @output, err: @error ).should eq 0
       Dir.chdir 'testworld'
-      Dir.pwd.should eq File.join( @original_path, @test_dir, 'testworld' )
+      @this_world_path = File.join( @original_path, @test_dir, 'testworld' )
+      Dir.pwd.should eq @this_world_path
+    end
+
+    before :each do
+      Dir.chdir @this_world_path
+      Dir.pwd.should eq @this_world_path
     end
 
     after :all do
       Dir.chdir @original_path
       Dir.pwd.should eq @original_path
+    end
+
+    it 'must be run within a world application directory' do
+      Dir.chdir '..'
+      Woyo::Runner.run( ['server'], out: @output, err: @error ).should eq -4  
     end
 
     it 'starts a world application server' do
@@ -148,6 +169,27 @@ describe Woyo::Runner do
 
   context 'console' do
 
+    before :all do
+      Dir.pwd.should eq @original_path
+      FileUtils.rm_rf @test_dir
+      FileUtils.mkdir_p @test_dir
+      Dir.chdir @test_dir
+      Dir.pwd.should eq File.join( @original_path, @test_dir )
+      Woyo::Runner.run( ['new','testworld'], out: @output, err: @error ).should eq 0
+      Dir.chdir 'testworld'
+      Dir.pwd.should eq File.join( @original_path, @test_dir, 'testworld' )
+    end
+
+    after :all do
+      Dir.chdir @original_path
+      Dir.pwd.should eq @original_path
+    end
+
+    it 'must be run within a world application directory' do
+      Dir.chdir '..'
+      Woyo::Runner.run( ['console'], out: @output, err: @error ).should eq -4
+    end
+    
     # it 'starts a world application console'
 
     # it 'help (-h/--help) explains console command' do
@@ -161,7 +203,76 @@ describe Woyo::Runner do
 
   context 'update' do
 
-    it 'updates a world application directory'
+    before :all do
+      Dir.pwd.should eq @original_path
+      FileUtils.rm_rf @test_dir
+      FileUtils.mkdir_p @test_dir
+      Dir.chdir @test_dir
+      Dir.pwd.should eq File.join( @original_path, @test_dir )
+      Woyo::Runner.run( ['new','testworld'], out: @output, err: @error ).should eq 0
+      Dir.chdir 'testworld'
+      @this_world_path = File.join( @original_path, @test_dir, 'testworld' )
+      Dir.pwd.should eq @this_world_path
+    end
+
+    before :each do
+      Dir.chdir @this_world_path
+      Dir.pwd.should eq @this_world_path
+    end
+
+    after :all do
+      Dir.chdir @original_path
+      Dir.pwd.should eq @original_path
+    end
+
+    it 'runs in a world application directory' do
+      Woyo::Runner.run( ['update'], out: @output, err: @error ).should eq 0
+    end
+
+    it 'updates existing standard files and directories' do
+      before = Time.now - 60 # new directory was deployed within last 60 seconds
+      Woyo::Runner.run( ['update'], out: @output, err: @error ).should eq 0
+      @contents.each do |dir,contents|
+        contents.each do |file|
+          unless ['.','..'].include?( file ) || File.symlink?( File.join(dir,file) )
+            File.mtime(File.join(dir,file)).should be < before 
+          end
+        end
+      end
+    end
+
+    it 'replaces missing standard files and directories' do
+      FileUtils.rm_rf 'views/server'
+      FileUtils.rm_rf 'public/server'
+      Woyo::Runner.run( ['update'], out: @output, err: @error ).should eq 0
+      @contents.each do |dir,contents|
+        contents.each do |file|
+          File.should exist File.join(dir,file)
+        end
+      end
+    end
+
+    it 'preserves custom files and directories' do
+      custom = %w( world/custom.rb views/app/custom.haml public/app/html/custom.html public/app/images/custom.png public/app/js/custom.js public/app/css/custom.css )
+      custom.each { |f| FileUtils.touch f }
+      Woyo::Runner.run( ['update'], out: @output, err: @error ).should eq 0
+      custom.each { |f| File.should exist f } 
+    end
+
+    it 'must be run within a world application directory' do
+      FileUtils.mkdir_p '../not-a-server'
+      Dir.chdir '../not-a-server'
+      Woyo::Runner.run( ['update'], out: @output, err: @error ).should eq -4
+    end
+
+    it 'requires force (-f/--force) to run in incomplete or non world application directory' do
+      FileUtils.mkdir_p '../not-a-server'
+      Dir.chdir '../not-a-server'
+      Woyo::Runner.run( ['update','--force'], out: @output, err: @error ).should eq 0
+      FileUtils.mkdir_p '../also-not-a-server'
+      Dir.chdir '../also-not-a-server'
+      Woyo::Runner.run( ['update','-f'], out: @output, err: @error ).should eq 0
+    end
 
     it 'help (-h/--help) explains update command' do
       [['-h'],['--help']].each do |help|

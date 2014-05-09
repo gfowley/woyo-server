@@ -60,22 +60,28 @@ describe Woyo::Server, :type => :feature do
   it 'welcome page is displayed if there is no world' do
     visit '/'
     status_code.should eq 200
-    page.should have_content 'Welcome'
+    page.should have_content 'Woyo'
   end
 
   it 'welcome page links to github docs' do
-    pending
     visit '/'
     status_code.should eq 200
-    page.should have_link 'a', href: 'https://github.com/iqeo/woyo-world/wiki'
-    page.should have_link 'a', href: 'https://github.com/iqeo/woyo-server/wiki'
+    page.should have_link '', href: 'https://github.com/iqeo/woyo-world/wiki'
+    page.should have_link '', href: 'https://github.com/iqeo/woyo-server/wiki'
+  end
+
+  it 'uses foundation framework' do
+    visit '/'
+    status_code.should eq 200
+    page.should have_css 'head link[href="foundation/css/foundation.css"]'
+    page.should have_css 'head script[src="foundation/js/vendor/modernizr.js"]'
   end
 
   it 'accepts a world (without start - display welcome)' do
     Woyo::Server.set :world, @small_world
     visit '/'
     status_code.should eq 200
-    page.should have_content 'Welcome'
+    page.should have_content 'Woyo'
   end
 
   it 'accepts a world (with start)' do
@@ -98,10 +104,6 @@ describe Woyo::Server, :type => :feature do
     page.should have_selector '.location#location_home .way#way_down .name',        text: 'Stairs'
     page.should have_selector '.location#location_home .way#way_down .description', text: 'Rickety stairs lead down'
   end               
-
-  it 'uses foundation stylesheets'
-
-  it 'uses jquery javascript'
 
   it 'goes way to another location' do
     Woyo::Server.set :world, @home_world
