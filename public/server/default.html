@@ -1,17 +1,42 @@
-<html>
+<!doctype html>
+<html class="no-js" lang="en">
   <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WOYO - World Of Your Own</title>
     <link rel="stylesheet" href="foundation/css/foundation.css" />
     <script src="foundation/js/vendor/modernizr.js"></script>
   </head>
   <body>
-    <h1>WOYO - World Of Your Own</h1>
-    <p>This is the default page on a Woyo::Server. You are seeing this page because the Woyo::World has not been created yet.</p>
-    <p>To create the World, create and edit .rb files in the world/ directory.</p>
-    <h2>Links</h2>
-    <ul>
-      <li><a href='https://github.com/iqeo/woyo-world/wiki'>Woyo-World documentation</a></li>
-      <li><a href='https://github.com/iqeo/woyo-server/wiki'>Woyo-Server documentation</a></li>
-    </ul>
+
+    <div class="row">
+      <div class="large-12 columns">
+        <h1>WOYO - World Of Your Own</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-12 columns">
+        <div class="panel">
+          <h3>Welcome to your Woyo::Server</h3>
+          <p>This is the default page on a Woyo::Server. You are seeing this page because the Woyo::World has not been created yet.</p>
+          <p>To create the World, create and edit .rb files in the world/ directory.</p>
+        </div>
+        <div class="panel">
+          <h3>Links</h3>
+          <ul>
+            <li><a href='https://github.com/iqeo/woyo-world/wiki'>Woyo-World documentation</a></li>
+            <li><a href='https://github.com/iqeo/woyo-server/wiki'>Woyo-Server documentation</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script src="foundation/js/vendor/jquery.js"></script>
+    <script src="foundation/js/foundation.min.js"></script>
+    <script>
+      $(document).foundation();
+    </script>
   </body>
 </html>                        
+

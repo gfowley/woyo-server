@@ -230,7 +230,7 @@ describe Woyo::Runner do
     end
 
     it 'updates existing standard files and directories' do
-      before = Time.now - 60 # new directory was deployed within last 60 seconds
+      before = Time.now - 30 # new directory was deployed within last 60 seconds
       Woyo::Runner.run( ['update'], out: @output, err: @error ).should eq 0
       @contents.each do |dir,contents|
         contents.each do |file|
