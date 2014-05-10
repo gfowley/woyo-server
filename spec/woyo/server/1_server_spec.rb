@@ -149,5 +149,11 @@ describe Woyo::Server, :type => :feature do
     page.should have_selector '.location#location_home .name',                text: 'Home'
   end
 
+  it 'title contains world name'
+ 
+  it 'describes attempting to go a closed way'
+
+  it 'describes going an open way'
+
 end
 

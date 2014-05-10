@@ -31,6 +31,7 @@ describe Woyo::Runner do
   end
 
   it 'prints a helpful message to stderr for help (-h/--help) switch' do
+    pending
     [['-h'],['--help']].each do |args|
       Woyo::Runner.run( args, out: @output, err: @error ).should eq 0
       @error.string.should include 'woyo'
@@ -108,6 +109,7 @@ describe Woyo::Runner do
     end
 
     it 'help (-h/--help) explains new command' do
+      pending
       [['-h'],['--help']].each do |help|
         Woyo::Runner.run( ['new'] + help, out: @output, err: @error ).should eq 0
         @error.string.should include 'woyo new'
@@ -159,6 +161,7 @@ describe Woyo::Runner do
     end
 
     it 'help (-h/--help) explains server command' do
+      pending
       [['-h'],['--help']].each do |help|
         Woyo::Runner.run( ['server'] + help, out: @output, err: @error ).should eq 0
         @error.string.should include 'woyo server'
@@ -193,6 +196,7 @@ describe Woyo::Runner do
     # it 'starts a world application console'
 
     # it 'help (-h/--help) explains console command' do
+    # pending
     #   [['-h'],['--help']].each do |help|
     #     Woyo::Runner.run( ['console'] + help, out: @output, err: @error ).should eq 0
     #     @error.string.should include 'woyo console'
@@ -275,6 +279,7 @@ describe Woyo::Runner do
     end
 
     it 'help (-h/--help) explains update command' do
+      pending
       [['-h'],['--help']].each do |help|
         Woyo::Runner.run( ['update'] + help, out: @output, err: @error ).should eq 0
         @error.string.should include 'woyo update'
