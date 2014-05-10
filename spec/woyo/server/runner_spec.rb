@@ -17,9 +17,9 @@ describe Woyo::Runner do
     @expected_entries = [ 'public', 'views', 'world' ]
     @contents = {
       '.'             => %w( . .. world views public ),
-      'world'         => %w( . .. ),
+      'world'         => %w( . .. .gitkeep ),
       'views'         => %w( . .. app server ),
-      'views/app'     => %w( . .. ),
+      'views/app'     => %w( . .. .gitkeep ),
       'views/server'  => %w( . .. layout.haml location.haml ),
       'public'        => %w( . .. app server ),
       'public/app'    => %w( . .. html images js css ),
