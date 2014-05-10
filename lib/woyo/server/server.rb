@@ -17,6 +17,8 @@ class Server < Sinatra::Application
   configure do
     enable :sessions
     set root: '.'
+    set views: Proc.new { File.join(root, "views/server") }
+    set public_folder: Proc.new { File.join(root, "public/server") }
     set world: self.load_world
   end
 
@@ -25,16 +27,16 @@ class Server < Sinatra::Application
   end
 
   get '/' do
-    redirect to '/server/default.html' if world.locations.empty? || ( !@location && !world.start )
+    redirect to 'default.html' if world.locations.empty? || ( !@location && !world.start )
     @location ||= world.locations[world.start]
     session[:location] = @location
-    haml 'server/location'.to_sym
+    haml :location
   end
 
   get '/go/*' do |way|
     @location = session[:location].ways[way.to_sym].to
     session[:location] = @location
-    haml 'server/location'.to_sym
+    haml :location
   end
 
   get '/do/*/*?/*?' do |item,action,tool|

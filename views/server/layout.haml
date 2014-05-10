@@ -1,6 +1,17 @@
 %html
+
   %head
-    %title The Title
+    %meta{ :charset => "utf-8" }
+    %meta{ :name => "viewport", :content => "width=device-width, initial-scale=1.0" }
+    %link{ :rel => "stylesheet", :href => "/foundation/css/foundation.css" }
+    %script{ :src => "/foundation/js/vendor/modernizr.js" }
+    %title WOYO - World of Your Own
+
   %body
+
     = yield
 
+    %script{ :src => "/foundation/js/vendor/jquery.js" }
+    %script{ :src => "/foundation/js/foundation.min.js" }
+    %script $(document).foundation();
+ 
