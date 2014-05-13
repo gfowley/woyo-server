@@ -5,6 +5,8 @@ describe Woyo::Server, :type => :feature do
 
   before :all do
     @small_world = Woyo::World.new do
+      name "Small World"
+      description "It's a small world after all"
       location :small
     end
     @home_world = Woyo::World.new do
@@ -77,83 +79,130 @@ describe Woyo::Server, :type => :feature do
     page.should have_css 'head script[src="foundation/js/vendor/modernizr.js"]'
   end
 
-  it 'accepts a world (without start - display welcome)' do
-    Woyo::Server.set :world, @small_world
-    visit '/'
-    status_code.should eq 200
-    page.should have_content 'Woyo'
+  context 'describes the world' do
+
+    it 'title is world name' do
+      Woyo::Server.set :world, @small_world
+      visit '/'
+      status_code.should eq 200
+      page.should have_title /^Small World$/
+    end
+
+    it 'without start location' do
+      Woyo::Server.set :world, @small_world
+      visit '/'
+      #STDOUT.puts page.html
+      #save_page
+      status_code.should eq 200
+      page.should have_selector '.world .name',        text: "Small World"
+      page.should have_selector '.world .description', text: "It's a small world after all"
+      page.should have_selector '.world .no-start'
+      page.should_not have_selector '.world .start'
+    end
+
+    it 'with start location' do
+      @small_world.start = :small
+      Woyo::Server.set :world, @small_world
+      visit '/'
+      status_code.should eq 200
+      page.should have_selector '.world .name',                      text: "Small World"
+      page.should have_selector '.world .description',               text: "It's a small world after all"
+      page.should have_selector '.world .start a[href="/location"]', text: "Start"
+      page.should_not have_selector '.world .no-start'
+    end
+
+    it 'shows file and lineno in stacktrace upon error loading world files'
+
   end
 
-  it 'accepts a world (with start)' do
-    @small_world.start = :small
-    Woyo::Server.set :world, @small_world
-    visit '/'
-    status_code.should eq 200
+  context 'describes locations' do
+
+    it 'title is location name'  do
+      Woyo::Server.set :world, @small_world
+      visit '/location'
+      status_code.should eq 200
+      page.should have_title /^Small$/
+    end
+
+    it 'start location' do 
+      Woyo::Server.set :world, @home_world
+      visit '/location'
+      status_code.should eq 200
+      page.should have_selector '.location#location_home'
+      page.should have_selector '.location#location_home .name',                      text: 'Home'
+      page.should have_selector '.location#location_home .description',               text: 'Where the heart is.'
+      page.should have_selector '.way#way_out'
+      page.should have_selector '.way#way_out .name',         text: 'Door'
+      page.should have_selector '.way#way_out .description',  text: 'A sturdy wooden door'
+      page.should have_selector '.way#way_down'
+      page.should have_selector '.way#way_down .name',        text: 'Stairs'
+      page.should have_selector '.way#way_down .description', text: 'Rickety stairs lead down'
+    end               
+
+    it 'goes way to another location' do
+      Woyo::Server.set :world, @home_world
+      visit '/location'
+      status_code.should eq 200
+      page.should have_selector '.way#way_out a#go_out'
+      click_on 'go_out'
+      status_code.should eq 200
+      page.should have_selector '.location#location_garden .name', text: 'Garden'
+    end
+
+    it 'tracks location (go and come back)' do
+      Woyo::Server.set :world, @home_world
+      visit '/location'
+      status_code.should eq 200
+      page.should have_selector '.location#location_home .name',                text: 'Home'
+      page.should have_selector '.way#way_out a#go_out'
+      click_on 'go_out'
+      status_code.should eq 200
+      page.should have_selector '.location#location_garden .name',              text: 'Garden'
+      page.should have_selector '.way#way_in a#go_in'
+      click_on 'go_in'
+      status_code.should eq 200
+      page.should have_selector '.location#location_home .name',                text: 'Home'
+    end
+
+    it 'tracks location (loop both directions)' do
+      Woyo::Server.set :world, @home_world
+      visit '/location'
+      status_code.should eq 200
+      page.should have_selector '.location#location_home .name',                text: 'Home'
+      page.should have_selector '.way#way_out a#go_out'
+      click_on 'go_out'
+      status_code.should eq 200
+      page.should have_selector '.location#location_garden .name',              text: 'Garden'
+      page.should have_selector '.way#way_down a#go_down'
+      click_on 'go_down'
+      status_code.should eq 200
+      page.should have_selector '.location#location_cellar .name',              text: 'Cellar'
+      page.should have_selector '.way#way_up a#go_up'
+      click_on 'go_up'
+      status_code.should eq 200
+      page.should have_selector '.location#location_home .name',                text: 'Home'
+      page.should have_selector '.way#way_down a#go_down'
+      click_on 'go_down'
+      status_code.should eq 200
+      page.should have_selector '.location#location_cellar .name',              text: 'Cellar'
+      page.should have_selector '.way#way_out a#go_out'
+      click_on 'go_out'
+      status_code.should eq 200
+      page.should have_selector '.location#location_garden .name',              text: 'Garden'
+      page.should have_selector '.way#way_in a#go_in'
+      click_on 'go_in'
+      status_code.should eq 200
+      page.should have_selector '.location#location_home .name',                text: 'Home'
+    end
   end
 
-  it 'describes the start location' do 
-    Woyo::Server.set :world, @home_world
-    visit '/'
-    page.should have_selector '.location#location_home'
-    page.should have_selector '.location#location_home .name',                      text: 'Home'
-    page.should have_selector '.location#location_home .description',               text: 'Where the heart is.'
-    page.should have_selector '.way#way_out'
-    page.should have_selector '.way#way_out .name',         text: 'Door'
-    page.should have_selector '.way#way_out .description',  text: 'A sturdy wooden door'
-    page.should have_selector '.way#way_down'
-    page.should have_selector '.way#way_down .name',        text: 'Stairs'
-    page.should have_selector '.way#way_down .description', text: 'Rickety stairs lead down'
-  end               
+  context 'describes ways' do
 
-  it 'goes way to another location' do
-    Woyo::Server.set :world, @home_world
-    visit '/'
-    page.should have_selector '.way#way_out a#go_out'
-    click_on 'go_out'
-    page.should have_selector '.location#location_garden .name', text: 'Garden'
+    it 'going a closed way'
+
+    it 'going an open way'
+
   end
-
-  it 'tracks location (go and come back)' do
-    Woyo::Server.set :world, @home_world
-    visit '/'
-    page.should have_selector '.location#location_home .name',                text: 'Home'
-    page.should have_selector '.way#way_out a#go_out'
-    click_on 'go_out'
-    page.should have_selector '.location#location_garden .name',              text: 'Garden'
-    page.should have_selector '.way#way_in a#go_in'
-    click_on 'go_in'
-    page.should have_selector '.location#location_home .name',                text: 'Home'
-  end
-
-  it 'tracks location (loop both directions)' do
-    Woyo::Server.set :world, @home_world
-    visit '/'
-    page.should have_selector '.location#location_home .name',                text: 'Home'
-    page.should have_selector '.way#way_out a#go_out'
-    click_on 'go_out'
-    page.should have_selector '.location#location_garden .name',              text: 'Garden'
-    page.should have_selector '.way#way_down a#go_down'
-    click_on 'go_down'
-    page.should have_selector '.location#location_cellar .name',              text: 'Cellar'
-    page.should have_selector '.way#way_up a#go_up'
-    click_on 'go_up'
-    page.should have_selector '.location#location_home .name',                text: 'Home'
-    page.should have_selector '.way#way_down a#go_down'
-    click_on 'go_down'
-    page.should have_selector '.location#location_cellar .name',              text: 'Cellar'
-    page.should have_selector '.way#way_out a#go_out'
-    click_on 'go_out'
-    page.should have_selector '.location#location_garden .name',              text: 'Garden'
-    page.should have_selector '.way#way_in a#go_in'
-    click_on 'go_in'
-    page.should have_selector '.location#location_home .name',                text: 'Home'
-  end
-
-  it 'title contains world name'
- 
-  it 'describes attempting to go a closed way'
-
-  it 'describes going an open way'
 
 end
 

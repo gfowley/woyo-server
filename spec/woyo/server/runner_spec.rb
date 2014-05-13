@@ -3,7 +3,7 @@ require 'fileutils'
 require 'stringio'
 require 'open-uri'
 
-STDERR.sync = true
+STDOUT.sync = true
 STDERR.sync = true
 
 describe Woyo::Runner do
@@ -20,7 +20,7 @@ describe Woyo::Runner do
       'world'         => %w( . .. .gitkeep ),
       'views'         => %w( . .. app server ),
       'views/app'     => %w( . .. .gitkeep ),
-      'views/server'  => %w( . .. layout.haml location.haml ),
+      'views/server'  => %w( . .. layout.haml location.haml world.haml ),
       'public'        => %w( . .. app server ),
       'public/app'    => %w( . .. html images js css ),
       'public/server' => %w( . .. default.html foundation foundation-5.2.2 jquery jquery-2.1.1 ),
@@ -147,6 +147,20 @@ describe Woyo::Runner do
       Woyo::Runner.run( ['server'], out: @output, err: @error ).should eq -4  
     end
 
+    it 'shows file and lineno in backtrace upon error loading world files' do
+      bad_world = "
+        location :bad do
+          raise 'boom'
+        end
+      "
+      File.write File.join(@this_world_path,'world','bad.rb'), bad_world
+      expect { Woyo::Runner.run( ['server'], out: @output, err: @error ) }.to_not raise_error do |e|
+        expect(e).to be_a String
+      end
+    end
+
+    # swap prev and next tests in order, how to ensure port binding is available to restart server for next test ????
+    
     it 'starts a world application server' do
       thread = Thread.new { Woyo::Runner.run( ['server'], out: @output, err: @error ) }
       thread.should be_alive
@@ -155,7 +169,7 @@ describe Woyo::Runner do
       Woyo::Server.set :world, Woyo::World.new { start :home ; location(:home) { name 'Home' } }
       page = ''
       expect { page = open("http://127.0.0.1:4567/").read }.to_not raise_error
-      page.should include 'Home'
+      page.should include 'Start'
       Woyo::Server.stop!
       thread.join
     end

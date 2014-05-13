@@ -5,7 +5,12 @@
     %meta{ :name => "viewport", :content => "width=device-width, initial-scale=1.0" }
     %link{ :rel => "stylesheet", :href => "/foundation/css/foundation.css" }
     %script{ :src => "/foundation/js/vendor/modernizr.js" }
-    %title WOYO - World of Your Own
+    %title<
+      - case 
+      - when @world
+        = @world.name
+      - when @location
+        = @location.name
 
   %body
 
