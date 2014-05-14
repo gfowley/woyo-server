@@ -147,20 +147,6 @@ describe Woyo::Runner do
       Woyo::Runner.run( ['server'], out: @output, err: @error ).should eq -4  
     end
 
-    it 'shows file and lineno in backtrace upon error loading world files' do
-      bad_world = "
-        location :bad do
-          raise 'boom'
-        end
-      "
-      File.write File.join(@this_world_path,'world','bad.rb'), bad_world
-      expect { Woyo::Runner.run( ['server'], out: @output, err: @error ) }.to_not raise_error do |e|
-        expect(e).to be_a String
-      end
-    end
-
-    # swap prev and next tests in order, how to ensure port binding is available to restart server for next test ????
-    
     it 'starts a world application server' do
       thread = Thread.new { Woyo::Runner.run( ['server'], out: @output, err: @error ) }
       thread.should be_alive

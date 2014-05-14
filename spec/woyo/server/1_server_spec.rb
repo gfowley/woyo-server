@@ -111,8 +111,18 @@ describe Woyo::Server, :type => :feature do
       page.should_not have_selector '.world .no-start'
     end
 
-    it 'shows file and lineno in stacktrace upon error loading world files'
-
+    it 'shows filename and lineno in backtrace upon error evaluating world' do
+      bad_world = "
+        location :bad do
+          raise 'boom'
+        end
+      "
+      expect { Woyo::Server.eval_world bad_world, 'bad_world' }.to raise_error { |e|
+        e.message.should eq 'boom'
+        e.backtrace.first.should =~ /^bad_world.3/
+      }
+    end
+    
   end
 
   context 'describes locations' do

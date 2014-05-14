@@ -6,12 +6,17 @@ module Woyo
 
 class Server < Sinatra::Application
 
-  def self.load_world
+  def self.load_world 
     world = Woyo::World.new
     Dir['world/*.rb'].each do |filename|
-      world.instance_eval File.read filename
+      eval_world File.read( filename ), filename
     end
     world
+  end
+
+  def self.eval_world text, filename, world = nil
+    world ||= Woyo::World.new
+    world.instance_eval text, filename
   end
 
   configure do
