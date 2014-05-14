@@ -122,7 +122,9 @@ describe Woyo::Server, :type => :feature do
         e.backtrace.first.should =~ /^bad_world.3/
       }
     end
-    
+
+    it 'loads world files from world/ directory'
+
   end
 
   context 'describes locations' do

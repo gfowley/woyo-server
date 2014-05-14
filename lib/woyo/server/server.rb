@@ -9,7 +9,7 @@ class Server < Sinatra::Application
   def self.load_world 
     world = Woyo::World.new
     Dir['world/*.rb'].each do |filename|
-      eval_world File.read( filename ), filename
+      eval_world File.read( filename ), filename, world
     end
     world
   end
