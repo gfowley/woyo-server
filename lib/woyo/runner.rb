@@ -91,7 +91,15 @@ class Runner
       print_error 'This is not a Woyo::Server directory'
       return -4
     end
+    if @args.include?('-d') || @args.include?('--dev')
+      FileUtils.ln_s 'foundation-5.2.2', 'public/server/foundation'
+      FileUtils.ln_s 'jquery-2.1.1', 'public/server/jquery'
+    end
     Woyo::Server.run!
+    if @args.include?('-d') || @args.include?('--dev')
+      FileUtils.rm 'public/server/foundation'
+      FileUtils.rm 'public/server/jquery'
+    end
     return 0
   end
 
