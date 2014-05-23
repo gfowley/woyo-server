@@ -63,7 +63,7 @@ describe Woyo::Server, :type => :feature do
   end
 
   # these must be the first tests so that Woyo::Server.setting.world is not set
-  # that is why this file is name 1_server_spec.rb
+  # that is why this file is named 1_server_spec.rb
 
   context 'with no world' do
 
@@ -244,19 +244,54 @@ describe Woyo::Server, :type => :feature do
     end
   end
 
-  context 'describes ways' do
+  context 'ways' do
 
-    it 'that are open'
+    before :all do
+      @ways_world = Woyo::World.new do
+        start :home
+        location :home do
+          way :door do
+            description open: 'A sturdy wooden door'
+            going       open: 'The door opens, leading to a sunlit garden'
+            to :garden
+          end
+          way :stairs do
+            description closed: 'Broken stairs lead down into darkness.'
+            going       closed: 'The broken stairs is impassable.'
+          end
+        end
+      end
+      Woyo::Server.set :world, @ways_world
+    end
 
-    it 'that are closed'
+    context 'are described being' do
 
-  end
+      before :each do
+        visit '/location'
+        status_code.should eq 200
+      end
 
-  context 'describes going' do
+      it 'open' do
+        page.should have_selector '.way#way_door a#go_door'
+        page.should have_selector '.way#way_door .name',         text: 'Door'
+        page.should have_selector '.way#way_door .description',  text: 'A sturdy wooden door'
+      end
 
-    it 'a closed way'
+      it 'closed' do
+        page.should have_selector '.way#way_stairs a#go_stairs'
+        page.should have_selector '.way#way_stairs .name',         text: 'Stairs'
+        page.should have_selector '.way#way_stairs .description',  text: 'Broken stairs lead down into darkness.'
+      end
 
-    it 'an open way'
+    end
+
+    context 'are described going' do
+
+      it 'closed'
+
+      it 'open'
+
+    end
 
   end
 
