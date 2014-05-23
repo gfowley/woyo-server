@@ -1,9 +1,15 @@
 require_relative '../../../lib/woyo/server'
 require 'spec_helper.rb'
+require 'fileutils'
 
 describe Woyo::Server, :type => :feature do
 
   before :all do
+    # directories
+    @original_path = Dir.pwd
+    File.basename(@original_path).should eq 'woyo-server'
+    @test_dir = 'tmp/test'
+    # worlds
     @small_world = Woyo::World.new do
       name "Small World"
       description "It's a small world after all"
@@ -59,24 +65,68 @@ describe Woyo::Server, :type => :feature do
   # these must be the first tests so that Woyo::Server.setting.world is not set
   # that is why this file is name 1_server_spec.rb
 
-  it 'welcome page is displayed if there is no world' do
-    visit '/'
-    status_code.should eq 200
-    page.should have_content 'Woyo'
+  context 'with no world' do
+
+    it 'welcome page is displayed if there is no world' do
+      visit '/'
+      status_code.should eq 200
+      page.should have_content 'Woyo'
+    end
+
+    it 'welcome page links to github docs' do
+      visit '/'
+      status_code.should eq 200
+      page.should have_link '', href: 'https://github.com/iqeo/woyo-world/wiki'
+      page.should have_link '', href: 'https://github.com/iqeo/woyo-server/wiki'
+    end
+
+    it 'uses foundation framework' do
+      visit '/'
+      status_code.should eq 200
+      page.should have_css 'head link[href="foundation/css/foundation.css"]'
+      page.should have_css 'head script[src="foundation/js/vendor/modernizr.js"]'
+    end
+
   end
 
-  it 'welcome page links to github docs' do
-    visit '/'
-    status_code.should eq 200
-    page.should have_link '', href: 'https://github.com/iqeo/woyo-world/wiki'
-    page.should have_link '', href: 'https://github.com/iqeo/woyo-server/wiki'
-  end
+  context 'loads the world' do
 
-  it 'uses foundation framework' do
-    visit '/'
-    status_code.should eq 200
-    page.should have_css 'head link[href="foundation/css/foundation.css"]'
-    page.should have_css 'head script[src="foundation/js/vendor/modernizr.js"]'
+    it 'from files in directory' do
+      content1 = "
+        name 'Simple'
+        start :one
+        location :one do
+          description 'First'
+        end
+      "
+      content2 = "
+        location :two do
+          description 'Second'
+        end
+      "
+      FileUtils.mkdir_p @test_dir
+      File.write File.join( @test_dir, 'file1.rb' ), content1
+      File.write File.join( @test_dir, 'file2.rb' ), content2
+      world = nil
+      expect { world = Woyo::Server.load_world File.join( @test_dir, '*.rb' ) }.to_not raise_error
+      Woyo::Server.set :world, world
+      visit '/'
+      status_code.should eq 200
+      page.should have_title /^Simple$/
+    end
+
+    it 'shows filename and lineno in backtrace upon error' do
+      bad_world = "
+        location :bad do
+          raise 'boom'
+        end
+      "
+      expect { Woyo::Server.eval_world bad_world, 'bad_world' }.to raise_error { |e|
+        e.message.should eq 'boom'
+        e.backtrace.first.should =~ /^bad_world.3/
+      }
+    end
+
   end
 
   context 'describes the world' do
@@ -110,20 +160,6 @@ describe Woyo::Server, :type => :feature do
       page.should have_selector '.world .start a[href="/location"]', text: "Start"
       page.should_not have_selector '.world .no-start'
     end
-
-    it 'shows filename and lineno in backtrace upon error evaluating world' do
-      bad_world = "
-        location :bad do
-          raise 'boom'
-        end
-      "
-      expect { Woyo::Server.eval_world bad_world, 'bad_world' }.to raise_error { |e|
-        e.message.should eq 'boom'
-        e.backtrace.first.should =~ /^bad_world.3/
-      }
-    end
-
-    it 'loads world files from world/ directory'
 
   end
 
@@ -210,9 +246,17 @@ describe Woyo::Server, :type => :feature do
 
   context 'describes ways' do
 
-    it 'going a closed way'
+    it 'that are open'
 
-    it 'going an open way'
+    it 'that are closed'
+
+  end
+
+  context 'describes going' do
+
+    it 'a closed way'
+
+    it 'an open way'
 
   end
 

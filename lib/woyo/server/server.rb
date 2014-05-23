@@ -6,9 +6,9 @@ module Woyo
 
 class Server < Sinatra::Application
 
-  def self.load_world 
+  def self.load_world glob = 'world/*.rb' 
     world = Woyo::World.new
-    Dir['world/*.rb'].each do |filename|
+    Dir[glob].each do |filename|
       eval_world File.read( filename ), filename, world
     end
     world
@@ -39,7 +39,7 @@ class Server < Sinatra::Application
 
   get '/location' do
     @location ||= world.locations[world.start]
-    session[:location] = @location
+    session[:location] = @location # fix: only store @location.id in session (cookie)
     haml :location
   end
 
