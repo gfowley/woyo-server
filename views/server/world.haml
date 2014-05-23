@@ -1,15 +1,15 @@
-%div.row
-  %div.large-12.columns
-    %div.world
+.row
+  .large-12.columns
+    .world
       %h1.name= @world.name
       %p.description= @world.description
 
-      %div.row
-        %div.large-12.columns
+      .row
+        .large-12.columns
         - if @world.start
-          %div.start
+          .start
             %a{ :href => "/location" } Start
         - else
-          %div.no-start
+          .no-start
             %p No start location defined
 

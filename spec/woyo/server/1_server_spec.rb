@@ -141,8 +141,6 @@ describe Woyo::Server, :type => :feature do
     it 'without start location' do
       Woyo::Server.set :world, @small_world
       visit '/'
-      #STDOUT.puts page.html
-      #save_page
       status_code.should eq 200
       page.should have_selector '.world .name',        text: "Small World"
       page.should have_selector '.world .description', text: "It's a small world after all"
@@ -168,6 +166,7 @@ describe Woyo::Server, :type => :feature do
     it 'title is location name'  do
       Woyo::Server.set :world, @small_world
       visit '/location'
+      save_page
       status_code.should eq 200
       page.should have_title /^Small$/
     end
@@ -264,12 +263,12 @@ describe Woyo::Server, :type => :feature do
       Woyo::Server.set :world, @ways_world
     end
 
-    context 'are described being' do
+    before :each do
+      visit '/location'
+      status_code.should eq 200
+    end
 
-      before :each do
-        visit '/location'
-        status_code.should eq 200
-      end
+    context 'are described being' do
 
       it 'open' do
         page.should have_selector '.way#way_door a#go_door'
@@ -287,7 +286,13 @@ describe Woyo::Server, :type => :feature do
 
     context 'are described going' do
 
-      it 'closed'
+      it 'closed' do
+        pending
+        page.should have_selector '.way#way_stairs a#go_stairs'
+        click_on 'go_stairs'      # this will be an ajax link
+        # save_page
+        status_code.should eq 200
+      end
 
       it 'open'
 

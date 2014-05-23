@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'sinatra/partial'
 require 'haml'
 require 'woyo/world'
 

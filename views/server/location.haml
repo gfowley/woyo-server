@@ -1,14 +1,7 @@
-%div.row
-  %div.large-12.columns
-    %div.location{ :id => "location_#{@location.id}" }
+.row
+  .large-12.columns
+    .location{ :id => "location_#{@location.id}" }
       %h1.name= @location.name
       %p.description= @location.description
-
-    - @location.ways.each do |id,way|
-      %div.row
-        %div.large-12.columns
-          %div.way{ :id => "way_#{id}" }
-            %a{ :id => "go_#{id}", :href => "/go/#{id}" }
-              %h3.name= way.name
-              %p.description= way.description
+      = partial :way, collection: @location.ways.values
 
