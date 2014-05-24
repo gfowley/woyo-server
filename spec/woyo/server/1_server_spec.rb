@@ -166,7 +166,6 @@ describe Woyo::Server, :type => :feature do
     it 'title is location name'  do
       Woyo::Server.set :world, @small_world
       visit '/location'
-      save_page
       status_code.should eq 200
       page.should have_title /^Small$/
     end

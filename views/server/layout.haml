@@ -5,6 +5,7 @@
     %meta{ :name => "viewport", :content => "width=device-width, initial-scale=1.0" }
     %link{ :rel => "stylesheet", :href => "/foundation/css/foundation.css" }
     %script{ :src => "/foundation/js/vendor/modernizr.js" }
+
     %title<
       - case 
       - when @world
@@ -18,5 +19,6 @@
 
     %script{ :src => "/foundation/js/vendor/jquery.js" }
     %script{ :src => "/foundation/js/foundation.min.js" }
-    %script $(document).foundation();
- 
+    %script{ :src => "/js/server.js" }
+
+

@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'sinatra/partial'
 require 'haml'
+require 'json'
 require 'woyo/world'
 
 module Woyo
@@ -35,19 +36,20 @@ class Server < Sinatra::Application
   get '/' do
     redirect to 'default.html' if world.name.nil? && world.description.nil? && world.start.nil?
     @world = world
+    session[:location_id] = world.start
     haml :world
   end
 
   get '/location' do
-    @location ||= world.locations[world.start]
-    session[:location] = @location # fix: only store @location.id in session (cookie)
+    @location = world.locations[session[:location_id]]
     haml :location
   end
 
-  get '/go/*' do |way|
-    @location = session[:location].ways[way.to_sym].to
-    session[:location] = @location
-    haml :location
+  get '/go/*' do |way_id|
+    way = world.locations[session[:location_id]].ways[way_id.to_sym]
+    session[:location_id] = way.to.id if way.open?
+    content_type :json
+    way.go.to_json
   end
 
   get '/do/*/*?/*?' do |item,action,tool|
