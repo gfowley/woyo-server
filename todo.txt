@@ -1,10 +1,8 @@
 
 Remove jquery and foundation symlinks in runner.rb
-
 Use haml tenplate for default page including layout.haml
 
 Indent going text and fade it in
-
 Fade out old page, fade in new page
 
 Debugger

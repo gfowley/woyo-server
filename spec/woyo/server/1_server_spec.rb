@@ -261,11 +261,12 @@ describe Woyo::Server, :type => :feature  do
           end
           way :stairs do
             description closed: 'Broken stairs lead down into darkness.', open: 'Never open' 
-            going       closed: 'The broken stairs are impassable.',       open: 'Never open' 
+            going       closed: 'The broken stairs are impassable.',      open: 'Never open' 
           end
           way :window do
             description 'A nice view.'
-            going       'Climbing out the window.'
+            going       'Makes no difference.'
+            to :yard
           end
         end
       end
@@ -292,7 +293,29 @@ describe Woyo::Server, :type => :feature  do
         page.should have_selector '.way#way_stairs .description',  text: 'Broken stairs lead down into darkness.'
       end
 
-      it 'by default' do
+    end
+
+    context 'are described with default' do
+
+      it 'open' do
+        window = @ways_world.locations[:home].ways[:window]
+        window.open!
+        window.should be_open
+        visit '/'
+        click_on 'start'
+        status_code.should eq 200
+        page.should have_selector '.way#way_window a#go_window'
+        page.should have_selector '.way#way_window .name',         text: 'Window'
+        page.should have_selector '.way#way_window .description',  text: 'A nice view.'
+      end
+
+      it 'closed' do
+        window = @ways_world.locations[:home].ways[:window]
+        window.close!
+        window.should be_closed
+        visit '/'
+        click_on 'start'
+        status_code.should eq 200
         page.should have_selector '.way#way_window a#go_window'
         page.should have_selector '.way#way_window .name',         text: 'Window'
         page.should have_selector '.way#way_window .description',  text: 'A nice view.'
@@ -319,6 +342,35 @@ describe Woyo::Server, :type => :feature  do
         page.should have_selector '.way#way_stairs a#go_stairs'
         click_link 'go_stairs'
         page.should have_selector '.way#way_stairs .going',        text: 'The broken stairs are impassable.'
+        page.should have_selector '.location#location_home .name', text: 'Home'
+      end
+
+    end
+
+    context 'are described going with default', :js => true do
+
+      it 'open' do
+        window = @ways_world.locations[:home].ways[:window]
+        window.open!
+        window.should be_open
+        visit '/'
+        click_on 'start'
+        page.should have_selector '.way#way_window a#go_window'
+        click_link 'go_window'
+        page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
+        sleep 4
+        page.should have_selector '.location#location_yard .name', text: 'Yard'
+      end
+
+      it 'closed' do
+        window = @ways_world.locations[:home].ways[:window]
+        window.close!
+        window.should be_closed
+        visit '/'
+        click_on 'start'
+        page.should have_selector '.way#way_window a#go_window'
+        click_link 'go_window'
+        page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
         page.should have_selector '.location#location_home .name', text: 'Home'
       end
 
