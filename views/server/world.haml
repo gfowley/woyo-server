@@ -8,7 +8,7 @@
         .large-12.columns
           - if @world.start
             .start
-              %a{ :href => "/location" } Start
+              %a#start{ :href => "/location" } Start
           - else
             .no-start
               %p No start location defined

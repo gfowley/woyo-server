@@ -16,7 +16,6 @@ tmux send-keys    -t rspec "rs" C-m
 
 tmux new-window   -n irb -d
 tmux send-keys    -t irb "cd ." C-m
-tmux send-keys    -t irb "irb" C-m
-
+tmux send-keys    -t irb "bundle exec irb -r 'woyo/server'" C-m 
 tmux swap-window  -s vim -t shell
 

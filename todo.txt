@@ -1,0 +1,22 @@
+
+Remove jquery and foundation symlinks in runner.rb
+
+Use haml tenplate for default page including layout.haml
+
+Indent going text and fade it in
+
+Fade out old page, fade in new page
+
+Debugger
+
+Test location description states
+
+Document DSL attributes and groups usage
+  -> way descriptions
+  -> way going
+  -> location descriptions
+
+Auto generate DSL docs from tests ?
+
+Test worlds in separate files - useful for manual testing
+
