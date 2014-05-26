@@ -58,8 +58,8 @@ class Runner
     [ 'public', 'views', 'world' ].each do |subdir|
       FileUtils.cp_r File.join( __dir__, '../../', subdir ), dir, preserve: true
     end
-    FileUtils.ln_s 'foundation-5.2.2', File.join(dir,'public/server/foundation')
-    FileUtils.ln_s 'jquery-2.1.1', File.join(dir,'public/server/jquery')
+    # FileUtils.ln_s 'foundation-5.2.2', File.join(dir,'public/server/foundation')
+    # FileUtils.ln_s 'jquery-2.1.1', File.join(dir,'public/server/jquery')
     return 0
   end
 
@@ -77,8 +77,8 @@ class Runner
     [ 'public', 'views', 'world' ].each do |subdir|
       FileUtils.cp_r File.join( __dir__, '../../', subdir ), '.', preserve: true
     end
-    FileUtils.ln_s 'foundation-5.2.2', 'public/server/foundation' unless File.exists? 'public/server/foundation'
-    FileUtils.ln_s 'jquery-2.1.1', 'public/server/jquery' unless File.exists? 'public/server/jquery'
+    # FileUtils.ln_s 'foundation-5.2.2', 'public/server/foundation' unless File.exists? 'public/server/foundation'
+    # FileUtils.ln_s 'jquery-2.1.1', 'public/server/jquery' unless File.exists? 'public/server/jquery'
     return 0
   end
 
@@ -91,15 +91,15 @@ class Runner
       print_error 'This is not a Woyo::Server directory'
       return -4
     end
-    if @args.include?('-d') || @args.include?('--dev')
-      FileUtils.ln_s 'foundation-5.2.2', 'public/server/foundation'
-      FileUtils.ln_s 'jquery-2.1.1', 'public/server/jquery'
-    end
+    # if @args.include?('-d') || @args.include?('--dev')
+    #   FileUtils.ln_s 'foundation-5.2.2', 'public/server/foundation'
+    #   FileUtils.ln_s 'jquery-2.1.1', 'public/server/jquery'
+    # end
     Woyo::Server.run!
-    if @args.include?('-d') || @args.include?('--dev')
-      FileUtils.rm 'public/server/foundation'
-      FileUtils.rm 'public/server/jquery'
-    end
+    # if @args.include?('-d') || @args.include?('--dev')
+    #   FileUtils.rm 'public/server/foundation'
+    #   FileUtils.rm 'public/server/jquery'
+    # end
     return 0
   end
 

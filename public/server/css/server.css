@@ -1,0 +1,10 @@
+
+body {
+  display:none;
+}
+
+p.going {
+  display:none;
+  padding-left:1em;
+}
+

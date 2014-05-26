@@ -187,65 +187,6 @@ describe Woyo::Server, :type => :feature  do
       page.should have_selector '.way#way_down .description', text: 'Rickety stairs lead down'
     end               
 
-    # it 'goes way to another location' do
-    #   Woyo::Server.set :world, @home_world
-    #   visit '/'
-    #   click_on 'start'
-    #   status_code.should eq 200
-    #   page.should have_selector '.way#way_out a#go_out'
-    #   click_on 'go_out'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_garden .name', text: 'Garden'
-    # end
-
-    # it 'tracks location (go and come back)' do
-    #   Woyo::Server.set :world, @home_world
-    #   visit '/'
-    #   click_on 'start'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_home .name',                text: 'Home'
-    #   page.should have_selector '.way#way_out a#go_out'
-    #   click_on 'go_out'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_garden .name',              text: 'Garden'
-    #   page.should have_selector '.way#way_in a#go_in'
-    #   click_on 'go_in'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_home .name',                text: 'Home'
-    # end
-
-    # it 'tracks location (loop both directions)' do
-    #   Woyo::Server.set :world, @home_world
-    #   visit '/'
-    #   click_on 'start'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_home .name',                text: 'Home'
-    #   page.should have_selector '.way#way_out a#go_out'
-    #   click_on 'go_out'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_garden .name',              text: 'Garden'
-    #   page.should have_selector '.way#way_down a#go_down'
-    #   click_on 'go_down'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_cellar .name',              text: 'Cellar'
-    #   page.should have_selector '.way#way_up a#go_up'
-    #   click_on 'go_up'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_home .name',                text: 'Home'
-    #   page.should have_selector '.way#way_down a#go_down'
-    #   click_on 'go_down'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_cellar .name',              text: 'Cellar'
-    #   page.should have_selector '.way#way_out a#go_out'
-    #   click_on 'go_out'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_garden .name',              text: 'Garden'
-    #   page.should have_selector '.way#way_in a#go_in'
-    #   click_on 'go_in'
-    #   status_code.should eq 200
-    #   page.should have_selector '.location#location_home .name',                text: 'Home'
-    # end
-
   end
 
   context 'ways' do
@@ -327,6 +268,7 @@ describe Woyo::Server, :type => :feature  do
 
       before :each do
         visit '/'
+        page.find('body', visible: true)
         click_on 'start'
       end
 
@@ -334,7 +276,7 @@ describe Woyo::Server, :type => :feature  do
         page.should have_selector '.way#way_door a#go_door'
         click_link 'go_door'
         page.should have_selector '.way#way_door .going',            text: 'The door opens, leading to a sunlit garden' 
-        sleep 4
+        sleep 3
         page.should have_selector '.location#location_garden .name', text: 'Garden'
       end
 
@@ -358,7 +300,7 @@ describe Woyo::Server, :type => :feature  do
         page.should have_selector '.way#way_window a#go_window'
         click_link 'go_window'
         page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
-        sleep 4
+        sleep 3
         page.should have_selector '.location#location_yard .name', text: 'Yard'
       end
 
