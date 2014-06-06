@@ -1,4 +1,13 @@
 
+! Smooth transitions for going ways
+! Multiline descriptions
+    <br/>   => <br/>        # html in text    
+    <br>    => <br/>        # html in text + fixup tag ?
+    </p><p> => </p><p ... > # html in text + set params for new paragraph
+    </p><p> => <p></p>      # html in text
+    \n      => <br/>        # convert
+    \n\n    => </p><p ... > # convert - set params for new paragraph
+
 Debugger
 Use haml tenplate for default page including layout.haml
 Test location description states

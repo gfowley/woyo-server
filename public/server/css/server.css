@@ -5,6 +5,7 @@ body {
 
 p.going {
   display:none;
+  opacity:0;
   padding-left:1em;
 }
 
