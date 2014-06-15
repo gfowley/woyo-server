@@ -2,6 +2,13 @@
 
 TODO: Write a gem description
 
+```ruby
+test = [1,2,3]
+test.each do |t|
+  puts t
+end
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
