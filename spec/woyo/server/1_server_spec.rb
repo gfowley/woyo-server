@@ -76,8 +76,8 @@ describe Woyo::Server, :type => :feature  do
     it 'welcome page links to github docs' do
       visit '/'
       status_code.should eq 200
-      page.should have_link '', href: 'https://github.com/iqeo/woyo-world/wiki'
-      page.should have_link '', href: 'https://github.com/iqeo/woyo-server/wiki'
+      page.should have_link '', href: 'https://iqeo.github.io/woyo-world/'
+      page.should have_link '', href: 'https://iqeo.github.io/woyo-server/'
     end
 
     it 'uses foundation framework' do

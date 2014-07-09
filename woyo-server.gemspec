@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "capybara"
   spec.add_development_dependency "selenium-webdriver"
 
-  spec.add_runtime_dependency "woyo-world", Woyo::SERVER_VERSION
+  spec.add_runtime_dependency "woyo-world", ">= #{Woyo::SERVER_VERSION}"
   spec.add_runtime_dependency "sinatra", "~> 1.4.5"
   spec.add_runtime_dependency "sinatra-contrib", "~> 1.4.2"
   spec.add_runtime_dependency "sinatra-partial"
