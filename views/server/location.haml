@@ -3,5 +3,6 @@
     .location{ :id => "location_#{@location.id}" }
       %h1.name= @location.name
       %p.description= @location.description
-      = partial :way, collection: @location.ways.values
+      = partial :way,  collection: @location.ways.values
+      = partial :item, collection: @location.items.values
 

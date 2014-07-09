@@ -34,7 +34,7 @@ class Server < Sinatra::Application
   end
 
   get '/' do
-    redirect to 'default.html' if world.name.nil? && world.description.nil? && world.start.nil?
+    redirect to 'default.html' if world.description.nil? && world.start.nil? # && world.name.nil? 
     @world = world
     session[:location_id] = world.start
     haml :world

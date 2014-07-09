@@ -12,7 +12,7 @@ describe Woyo::Server, :type => :feature  do
     # worlds
     @small_world = Woyo::World.new do
       name "Small World"
-      description "It's a small world after all"
+      description "It's a small world after all."
       location :small
     end
     @home_world = Woyo::World.new do
@@ -27,35 +27,44 @@ describe Woyo::Server, :type => :feature  do
         end
         way :down do
           name 'Stairs'
-          description 'Rickety stairs lead down into darkness. A dank smell emanates from the darkness below'
+          description 'Rickety stairs lead down into darkness. A dank smell emanates from the darkness below.'
           to :cellar
+        end
+        item :table do
+          description 'A sturdy table.'
+        end
+        item :chair do
+          description 'A comfortable chair.'
+        end
+        item :lamp do
+          description 'A small lamp sits upon the table.'
         end
       end
       location :garden do
         name 'Garden'
-        description 'A peaceful green oasis of life in the midst of a gray city'
+        description 'A peaceful green oasis of life in the midst of a gray city.'
         way :in do
           name 'Door'
-          description 'Door leads inside a cute cottage'
+          description 'Door leads inside a cute cottage.'
           to :home
         end
         way :down do
           name 'Bulkhead'
-          description 'Rusty bulkhead door and stairs'
+          description 'Rusty bulkhead door and stairs.'
           to :cellar
         end
       end
       location :cellar do
         name 'Cellar'
-        description 'Dark and damp, full of shadows and strange sounds'
+        description 'Dark and damp, full of shadows and strange sounds.'
         way :out do
           name 'Bulkhead'
-          description 'Rusty bulkhead stairs and door'
+          description 'Rusty bulkhead stairs and door.'
           to :garden
         end
         way :up do
           name 'Stairs'
-          description 'Rickety stairs lead up into light'
+          description 'Rickety stairs lead up into light.'
           to :home
         end
       end
@@ -143,7 +152,7 @@ describe Woyo::Server, :type => :feature  do
       visit '/'
       status_code.should eq 200
       page.should have_selector '.world .name',        text: "Small World"
-      page.should have_selector '.world .description', text: "It's a small world after all"
+      page.should have_selector '.world .description', text: "It's a small world after all."
       page.should have_selector '.world .no-start'
       page.should_not have_selector '.world .start'
     end
@@ -154,7 +163,7 @@ describe Woyo::Server, :type => :feature  do
       visit '/'
       status_code.should eq 200
       page.should have_selector '.world .name',                      text: "Small World"
-      page.should have_selector '.world .description',               text: "It's a small world after all"
+      page.should have_selector '.world .description',               text: "It's a small world after all."
       page.should have_selector '.world .start a[href="/location"]', text: "Start"
       page.should_not have_selector '.world .no-start'
     end
@@ -177,143 +186,156 @@ describe Woyo::Server, :type => :feature  do
       click_on 'start'
       status_code.should eq 200
       page.should have_selector '.location#location_home'
-      page.should have_selector '.location#location_home .name',                      text: 'Home'
-      page.should have_selector '.location#location_home .description',               text: 'Where the heart is.'
+      page.should have_selector '.location#location_home .name',        text: 'Home'
+      page.should have_selector '.location#location_home .description', text: 'Where the heart is.'
       page.should have_selector '.way#way_out'
       page.should have_selector '.way#way_out .name',         text: 'Door'
-      page.should have_selector '.way#way_out .description',  text: 'A sturdy wooden door'
+      page.should have_selector '.way#way_out .description',  text: 'A sturdy wooden door, '
       page.should have_selector '.way#way_down'
       page.should have_selector '.way#way_down .name',        text: 'Stairs'
-      page.should have_selector '.way#way_down .description', text: 'Rickety stairs lead down'
+      page.should have_selector '.way#way_down .description', text: 'Rickety stairs lead down into darkness.'
+      page.should have_selector '.item#item_table'
+      page.should have_selector '.item#item_table .name',          text: 'Table'
+      page.should have_selector '.item#item_table .description',   text: 'A sturdy table.'
+      page.should have_selector '.item#item_chair'
+      page.should have_selector '.item#item_chair .name',          text: 'Chair'
+      page.should have_selector '.item#item_chair .description',   text: 'A comfortable chair.'
+      page.should have_selector '.item#item_lamp'
+      page.should have_selector '.item#item_lamp  .name',          text: 'Lamp'
+      page.should have_selector '.item#item_lamp  .description',   text: 'A small lamp sits upon the table.'
     end               
 
-  end
+    context 'items' do
 
-  context 'ways' do
+    end
 
-    before :all do
-      @ways_world = Woyo::World.new do
-        start :home
-        location :home do
-          way :door do
-            description open: 'A sturdy wooden door',                       closed: 'Never closed'
-            going       open: 'The door opens, leading to a sunlit garden', closed: 'Never closed'
-            to :garden
-          end
-          way :stairs do
-            description closed: 'Broken stairs lead down into darkness.', open: 'Never open' 
-            going       closed: 'The broken stairs are impassable.',      open: 'Never open' 
-          end
-          way :window do
-            description 'A nice view.'
-            going       'Makes no difference.'
-            to :yard
+    context 'ways' do
+
+      before :all do
+        @ways_world = Woyo::World.new do
+          start :home
+          location :home do
+            way :door do
+              description open: 'A sturdy wooden door.',                       closed: 'Never closed'
+              going       open: 'The door opens, leading to a sunlit garden.', closed: 'Never closed'
+              to :garden
+            end
+            way :stairs do
+              description closed: 'Broken stairs lead down into darkness.', open: 'Never open' 
+              going       closed: 'The broken stairs are impassable.',      open: 'Never open' 
+            end
+            way :window do
+              description 'A nice view.'
+              going       'Makes no difference.'
+              to :yard
+            end
           end
         end
-      end
-      Woyo::Server.set :world, @ways_world
-    end
-
-    context 'are described' do
-
-      before :each do
-        visit '/'
-        click_on 'start'
-        status_code.should eq 200
+        Woyo::Server.set :world, @ways_world
       end
 
-      it 'open' do
-        page.should have_selector '.way#way_door a#go_door'
-        page.should have_selector '.way#way_door .name',         text: 'Door'
-        page.should have_selector '.way#way_door .description',  text: 'A sturdy wooden door'
+      context 'are described' do
+
+        before :each do
+          visit '/'
+          click_on 'start'
+          status_code.should eq 200
+        end
+
+        it 'open' do
+          page.should have_selector '.way#way_door a#go_door'
+          page.should have_selector '.way#way_door .name',         text: 'Door'
+          page.should have_selector '.way#way_door .description',  text: 'A sturdy wooden door.'
+        end
+
+        it 'closed' do
+          page.should have_selector '.way#way_stairs a#go_stairs'
+          page.should have_selector '.way#way_stairs .name',         text: 'Stairs'
+          page.should have_selector '.way#way_stairs .description',  text: 'Broken stairs lead down into darkness.'
+        end
+
       end
 
-      it 'closed' do
-        page.should have_selector '.way#way_stairs a#go_stairs'
-        page.should have_selector '.way#way_stairs .name',         text: 'Stairs'
-        page.should have_selector '.way#way_stairs .description',  text: 'Broken stairs lead down into darkness.'
+      context 'are described with default' do
+
+        it 'open' do
+          window = @ways_world.locations[:home].ways[:window]
+          window.open!
+          window.should be_open
+          visit '/'
+          click_on 'start'
+          status_code.should eq 200
+          page.should have_selector '.way#way_window a#go_window'
+          page.should have_selector '.way#way_window .name',         text: 'Window'
+          page.should have_selector '.way#way_window .description',  text: 'A nice view.'
+        end
+
+        it 'closed' do
+          window = @ways_world.locations[:home].ways[:window]
+          window.close!
+          window.should be_closed
+          visit '/'
+          click_on 'start'
+          status_code.should eq 200
+          page.should have_selector '.way#way_window a#go_window'
+          page.should have_selector '.way#way_window .name',         text: 'Window'
+          page.should have_selector '.way#way_window .description',  text: 'A nice view.'
+        end
+
       end
 
-    end
+      context 'are described going', :js => true do
 
-    context 'are described with default' do
+        before :each do
+          visit '/'
+          page.find('body', visible: true)
+          click_on 'start'
+        end
 
-      it 'open' do
-        window = @ways_world.locations[:home].ways[:window]
-        window.open!
-        window.should be_open
-        visit '/'
-        click_on 'start'
-        status_code.should eq 200
-        page.should have_selector '.way#way_window a#go_window'
-        page.should have_selector '.way#way_window .name',         text: 'Window'
-        page.should have_selector '.way#way_window .description',  text: 'A nice view.'
+        it 'open' do
+          page.should have_selector '.way#way_door a#go_door'
+          click_link 'go_door'
+          page.should have_selector '.way#way_door .going',            text: 'The door opens, leading to a sunlit garden.' 
+          sleep 3
+          page.should have_selector '.location#location_garden .name', text: 'Garden'
+        end
+
+        it 'closed' do
+          page.should have_selector '.way#way_stairs a#go_stairs'
+          click_link 'go_stairs'
+          page.should have_selector '.way#way_stairs .going',        text: 'The broken stairs are impassable.'
+          page.should have_selector '.location#location_home .name', text: 'Home'
+        end
+
       end
 
-      it 'closed' do
-        window = @ways_world.locations[:home].ways[:window]
-        window.close!
-        window.should be_closed
-        visit '/'
-        click_on 'start'
-        status_code.should eq 200
-        page.should have_selector '.way#way_window a#go_window'
-        page.should have_selector '.way#way_window .name',         text: 'Window'
-        page.should have_selector '.way#way_window .description',  text: 'A nice view.'
-      end
+      context 'are described going with default', :js => true do
 
-    end
+        it 'open' do
+          window = @ways_world.locations[:home].ways[:window]
+          window.open!
+          window.should be_open
+          visit '/'
+          click_on 'start'
+          page.should have_selector '.way#way_window a#go_window'
+          click_link 'go_window'
+          page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
+          sleep 3
+          page.should have_selector '.location#location_yard .name', text: 'Yard'
+        end
 
-    context 'are described going', :js => true do
+        it 'closed' do
+          window = @ways_world.locations[:home].ways[:window]
+          window.close!
+          window.should be_closed
+          visit '/'
+          click_on 'start'
+          page.should have_selector '.way#way_window a#go_window'
+          click_link 'go_window'
+          page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
+          page.should have_selector '.location#location_home .name', text: 'Home'
+        end
 
-      before :each do
-        visit '/'
-        page.find('body', visible: true)
-        click_on 'start'
-      end
-
-      it 'open' do
-        page.should have_selector '.way#way_door a#go_door'
-        click_link 'go_door'
-        page.should have_selector '.way#way_door .going',            text: 'The door opens, leading to a sunlit garden' 
-        sleep 3
-        page.should have_selector '.location#location_garden .name', text: 'Garden'
-      end
-
-      it 'closed' do
-        page.should have_selector '.way#way_stairs a#go_stairs'
-        click_link 'go_stairs'
-        page.should have_selector '.way#way_stairs .going',        text: 'The broken stairs are impassable.'
-        page.should have_selector '.location#location_home .name', text: 'Home'
-      end
-
-    end
-
-    context 'are described going with default', :js => true do
-
-      it 'open' do
-        window = @ways_world.locations[:home].ways[:window]
-        window.open!
-        window.should be_open
-        visit '/'
-        click_on 'start'
-        page.should have_selector '.way#way_window a#go_window'
-        click_link 'go_window'
-        page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
-        sleep 3
-        page.should have_selector '.location#location_yard .name', text: 'Yard'
-      end
-
-      it 'closed' do
-        window = @ways_world.locations[:home].ways[:window]
-        window.close!
-        window.should be_closed
-        visit '/'
-        click_on 'start'
-        page.should have_selector '.way#way_window a#go_window'
-        click_link 'go_window'
-        page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
-        page.should have_selector '.location#location_home .name', text: 'Home'
       end
 
     end
