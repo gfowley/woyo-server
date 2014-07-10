@@ -1,7 +1,6 @@
 .row
   .large-12.columns
-    .way{ :id => "way_#{way.id}" }
-      %a.go{ :id => "go_#{way.id}", :href => "/go/#{way.id}" }
-        %h3.name= way.name
+    .way{ :id => "way-#{way.id}" }
+      %a.go{ :id => "go-#{way.id}", :href => "/go/#{way.id}" }
         %p.description= way.description
       %p.going

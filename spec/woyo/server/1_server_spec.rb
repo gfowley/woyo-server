@@ -37,7 +37,19 @@ describe Woyo::Server, :type => :feature  do
           description 'A comfortable chair.'
         end
         item :lamp do
-          description 'A small lamp sits upon the table.'
+          description 'A small lamp sits in darkness upon the table.'
+          # todo... description light:   'A small lamp lights the table.',
+          #                     default: 'A small lamp sits in darkness upon the table.'
+          attribute light: false 
+          action( :switch ) { light !light }
+          # todo...  track all affected attributes and registered listeners, return that list after action ?
+          # todo...  do
+          #            light !light
+          #            {
+          #              affected:    affected,
+          #              description: light ? 'The lamp flickers to life, casting a dim light on the table.' : 'The lamp turns off.'
+          #            }
+          #          end
         end
       end
       location :garden do
@@ -153,7 +165,7 @@ describe Woyo::Server, :type => :feature  do
       status_code.should eq 200
       page.should have_selector '.world .name',        text: "Small World"
       page.should have_selector '.world .description', text: "It's a small world after all."
-      page.should have_selector '.world .no-start'
+      page.should have_selector '.world .no_start'
       page.should_not have_selector '.world .start'
     end
 
@@ -165,7 +177,7 @@ describe Woyo::Server, :type => :feature  do
       page.should have_selector '.world .name',                      text: "Small World"
       page.should have_selector '.world .description',               text: "It's a small world after all."
       page.should have_selector '.world .start a[href="/location"]', text: "Start"
-      page.should_not have_selector '.world .no-start'
+      page.should_not have_selector '.world .no_start'
     end
 
   end
@@ -184,25 +196,16 @@ describe Woyo::Server, :type => :feature  do
       Woyo::Server.set :world, @home_world
       visit '/'
       click_on 'start'
+      save_page
       status_code.should eq 200
-      page.should have_selector '.location#location_home'
-      page.should have_selector '.location#location_home .name',        text: 'Home'
-      page.should have_selector '.location#location_home .description', text: 'Where the heart is.'
-      page.should have_selector '.way#way_out'
-      page.should have_selector '.way#way_out .name',         text: 'Door'
-      page.should have_selector '.way#way_out .description',  text: 'A sturdy wooden door, '
-      page.should have_selector '.way#way_down'
-      page.should have_selector '.way#way_down .name',        text: 'Stairs'
-      page.should have_selector '.way#way_down .description', text: 'Rickety stairs lead down into darkness.'
-      page.should have_selector '.item#item_table'
-      page.should have_selector '.item#item_table .name',          text: 'Table'
-      page.should have_selector '.item#item_table .description',   text: 'A sturdy table.'
-      page.should have_selector '.item#item_chair'
-      page.should have_selector '.item#item_chair .name',          text: 'Chair'
-      page.should have_selector '.item#item_chair .description',   text: 'A comfortable chair.'
-      page.should have_selector '.item#item_lamp'
-      page.should have_selector '.item#item_lamp  .name',          text: 'Lamp'
-      page.should have_selector '.item#item_lamp  .description',   text: 'A small lamp sits upon the table.'
+      page.should have_selector '.location#location-home .name',        text: 'Home'
+      page.should have_selector '.location#location-home .description', text: 'Where the heart is.'
+      page.should have_selector '.way#way-out .description',            text: 'A sturdy wooden door, '
+      page.should have_selector '.way#way-down .description',           text: 'Rickety stairs lead down into darkness.'
+      page.should have_selector '.item#item-table .description',        text: 'A sturdy table.'
+      page.should have_selector '.item#item-chair .description',        text: 'A comfortable chair.'
+      page.should have_selector '.item#item-lamp  .description',        text: 'A small lamp sits in darkness upon the table.'
+      page.should have_selector '.action#action-item-lamp-switch',      text: 'switch'
     end               
 
     context 'items' do
@@ -243,15 +246,13 @@ describe Woyo::Server, :type => :feature  do
         end
 
         it 'open' do
-          page.should have_selector '.way#way_door a#go_door'
-          page.should have_selector '.way#way_door .name',         text: 'Door'
-          page.should have_selector '.way#way_door .description',  text: 'A sturdy wooden door.'
+          page.should have_selector '.way#way-door a#go-door'
+          page.should have_selector '.way#way-door .description',  text: 'A sturdy wooden door.'
         end
 
         it 'closed' do
-          page.should have_selector '.way#way_stairs a#go_stairs'
-          page.should have_selector '.way#way_stairs .name',         text: 'Stairs'
-          page.should have_selector '.way#way_stairs .description',  text: 'Broken stairs lead down into darkness.'
+          page.should have_selector '.way#way-stairs a#go-stairs'
+          page.should have_selector '.way#way-stairs .description',  text: 'Broken stairs lead down into darkness.'
         end
 
       end
@@ -265,9 +266,8 @@ describe Woyo::Server, :type => :feature  do
           visit '/'
           click_on 'start'
           status_code.should eq 200
-          page.should have_selector '.way#way_window a#go_window'
-          page.should have_selector '.way#way_window .name',         text: 'Window'
-          page.should have_selector '.way#way_window .description',  text: 'A nice view.'
+          page.should have_selector '.way#way-window a#go-window'
+          page.should have_selector '.way#way-window .description',  text: 'A nice view.'
         end
 
         it 'closed' do
@@ -277,9 +277,8 @@ describe Woyo::Server, :type => :feature  do
           visit '/'
           click_on 'start'
           status_code.should eq 200
-          page.should have_selector '.way#way_window a#go_window'
-          page.should have_selector '.way#way_window .name',         text: 'Window'
-          page.should have_selector '.way#way_window .description',  text: 'A nice view.'
+          page.should have_selector '.way#way-window a#go-window'
+          page.should have_selector '.way#way-window .description',  text: 'A nice view.'
         end
 
       end
@@ -293,18 +292,18 @@ describe Woyo::Server, :type => :feature  do
         end
 
         it 'open' do
-          page.should have_selector '.way#way_door a#go_door'
-          click_link 'go_door'
-          page.should have_selector '.way#way_door .going',            text: 'The door opens, leading to a sunlit garden.' 
+          page.should have_selector '.way#way-door a#go-door'
+          click_link 'go-door'
+          page.should have_selector '.way#way-door .going',            text: 'The door opens, leading to a sunlit garden.' 
           sleep 3
-          page.should have_selector '.location#location_garden .name', text: 'Garden'
+          page.should have_selector '.location#location-garden .name', text: 'Garden'
         end
 
         it 'closed' do
-          page.should have_selector '.way#way_stairs a#go_stairs'
-          click_link 'go_stairs'
-          page.should have_selector '.way#way_stairs .going',        text: 'The broken stairs are impassable.'
-          page.should have_selector '.location#location_home .name', text: 'Home'
+          page.should have_selector '.way#way-stairs a#go-stairs'
+          click_link 'go-stairs'
+          page.should have_selector '.way#way-stairs .going',        text: 'The broken stairs are impassable.'
+          page.should have_selector '.location#location-home .name', text: 'Home'
         end
 
       end
@@ -317,11 +316,11 @@ describe Woyo::Server, :type => :feature  do
           window.should be_open
           visit '/'
           click_on 'start'
-          page.should have_selector '.way#way_window a#go_window'
-          click_link 'go_window'
-          page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
+          page.should have_selector '.way#way-window a#go-window'
+          click_link 'go-window'
+          page.should have_selector '.way#way-window .going',        text: 'Makes no difference.' 
           sleep 3
-          page.should have_selector '.location#location_yard .name', text: 'Yard'
+          page.should have_selector '.location#location-yard .name', text: 'Yard'
         end
 
         it 'closed' do
@@ -330,10 +329,10 @@ describe Woyo::Server, :type => :feature  do
           window.should be_closed
           visit '/'
           click_on 'start'
-          page.should have_selector '.way#way_window a#go_window'
-          click_link 'go_window'
+          page.should have_selector '.way#way_window a#go-window'
+          click_link 'go-window'
           page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
-          page.should have_selector '.location#location_home .name', text: 'Home'
+          page.should have_selector '.location#location-home .name', text: 'Home'
         end
 
       end

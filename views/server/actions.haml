@@ -1,0 +1,4 @@
+%ul.actions
+  - owner_type = owner.class.name.split('::').last.downcase
+  - owner.actions.names.each do |action|
+    %li.action{ :id => "action-#{owner_type}-#{owner.id}-#{action}" }= action

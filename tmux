@@ -12,7 +12,7 @@ tmux send-keys    -t vim "vim ." C-m
 
 tmux new-window   -n rspec -d
 tmux send-keys    -t rspec "cd ." C-m
-tmux send-keys    -t rspec "rs" C-m
+tmux send-keys    -t rspec "rs --tag ~js" C-m
 
 tmux new-window   -n irb -d
 tmux send-keys    -t irb "cd ." C-m

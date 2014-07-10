@@ -1,6 +1,6 @@
 .row
   .large-12.columns
-    .item{ :id => "item_#{item.id}" }
-      %h3.name= item.name
+    .item{ :id => "item-#{item.id}" }
       %p.description= item.description
-
+      = partial :actions, locals: { owner: item }
+            
