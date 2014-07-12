@@ -3,6 +3,12 @@ body {
   display:none;
 }
 
+p.doing {
+  display:none;
+  opacity:0;
+  padding-left:1em;
+}
+
 p.going {
   display:none;
   opacity:0;

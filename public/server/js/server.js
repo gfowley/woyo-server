@@ -20,12 +20,13 @@ $(document).ready( function() {
     go_url = $go_link.attr("href");
     $.get( go_url, function(json) {
       if ( json.going.length > 0 ) {
-        // fix: animate slide with an easing function that begins and ends less abruptly
-        $go_link.siblings(".going")
+        $go_link
+        .siblings(".going")
         .text(json.going)
         .slideDown(woyo.time.go_slide)
         .animate({opacity: 1}, woyo.time.go_fade)
-        .delay(woyo.time.go_delay).queue( function(next) {
+        .delay(woyo.time.go_delay)
+        .queue( function(next) {
           if ( json.go == true ) {
             $("body").fadeOut(woyo.time.page_out, function() {
               window.location.reload(true);
@@ -43,5 +44,36 @@ $(document).ready( function() {
     });
     return false;
   });
+
+  $("a.do").click( function() {
+    owner = $("#" + $(this).parent().attr("owner_element"));
+    do_url = $(this).attr("href");
+    $.get( do_url, function(json) {
+      if ( json.doing.length > 0 ) {
+        owner
+        .children(".doing")
+        .text(json.doing)
+        .slideDown(woyo.time.go_slide)
+        .animate({opacity: 1}, woyo.time.go_fade)
+        .delay(woyo.time.go_delay)
+        .queue( function(next) {
+          if ( json.change_location == true ) {
+            $("body").fadeOut(woyo.time.page_out, function() {
+              window.location.reload(true);
+            });
+          };
+          next();
+        });
+      } else {
+        if ( json.change_location == true ) {
+          $("body").fadeOut(woyo.time.page_out, function() {
+            window.location.reload(true);
+          });
+        };
+      };
+    });
+    return false;
+  });
+
 });
  

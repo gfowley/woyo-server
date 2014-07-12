@@ -52,8 +52,10 @@ class Server < Sinatra::Application
     way.go.to_json
   end
 
-  get '/do/*/*?/*?' do |item,action,tool|
-    # do default or optional action on required item with optional tool
+  get '/do/*/*/*' do |owner_type,owner_id,action_id|
+    world.locations[session[:location_id]].item( :lamp ).switch
+    content_type :json
+    { doing: 'Doing it!', change_location: true }.to_json
   end
   
 end

@@ -20,7 +20,7 @@ describe Woyo::Runner do
       'world'         => %w( . .. .gitkeep ),
       'views'         => %w( . .. app server ),
       'views/app'     => %w( . .. .gitkeep ),
-      'views/server'  => %w( . .. item.haml layout.haml location.haml way.haml world.haml ),
+      'views/server'  => %w( . .. actions.haml item.haml layout.haml location.haml way.haml world.haml ),
       'public'        => %w( . .. app server ),
       'public/app'    => %w( . .. html images js css ),
       'public/server' => %w( . .. css default.html foundation-5.2.2 jquery-2.1.1 js ),

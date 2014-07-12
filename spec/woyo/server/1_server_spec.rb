@@ -38,18 +38,8 @@ describe Woyo::Server, :type => :feature  do
         end
         item :lamp do
           description 'A small lamp sits in darkness upon the table.'
-          # todo... description light:   'A small lamp lights the table.',
-          #                     default: 'A small lamp sits in darkness upon the table.'
           attribute light: false 
           action( :switch ) { light !light }
-          # todo...  track all affected attributes and registered listeners, return that list after action ?
-          # todo...  do
-          #            light !light
-          #            {
-          #              affected:    affected,
-          #              description: light ? 'The lamp flickers to life, casting a dim light on the table.' : 'The lamp turns off.'
-          #            }
-          #          end
         end
       end
       location :garden do
@@ -196,7 +186,7 @@ describe Woyo::Server, :type => :feature  do
       Woyo::Server.set :world, @home_world
       visit '/'
       click_on 'start'
-      save_page
+      # save_page
       status_code.should eq 200
       page.should have_selector '.location#location-home .name',        text: 'Home'
       page.should have_selector '.location#location-home .description', text: 'Where the heart is.'
@@ -205,10 +195,64 @@ describe Woyo::Server, :type => :feature  do
       page.should have_selector '.item#item-table .description',        text: 'A sturdy table.'
       page.should have_selector '.item#item-chair .description',        text: 'A comfortable chair.'
       page.should have_selector '.item#item-lamp  .description',        text: 'A small lamp sits in darkness upon the table.'
-      page.should have_selector '.action#action-item-lamp-switch',      text: 'switch'
+      page.should have_selector '.action#action-item-lamp-switch .name', text: 'switch'
     end               
 
     context 'items' do
+
+    end
+
+    context 'actions' do
+
+      before :all do
+        @actions_world = Woyo::World.new do
+          start :home
+          location :home do
+            item :lamp do
+              description on:  "Lamp is on.",
+                          off: "Lamp is off."
+              # todo... description light:   'A small lamp lights the table.',
+              #                     default: 'A small lamp sits in darkness upon the table.'
+              exclusion :light, :off, :on 
+              action :switch do
+                on off  
+              end
+              # todo...  track all affected attributes and registered listeners, return that list after action ?
+              # todo...  do
+              #            light !light
+              #            {
+              #              affected:    affected,
+              #              description: light ? 'The lamp flickers to life, casting a dim light on the table.' : 'The lamp turns off.'
+              #            }
+              #          end
+            end
+          end
+        end
+        Woyo::Server.set :world, @actions_world
+      end
+
+      before :each do
+        visit '/'
+        click_on 'start'
+      end
+
+      it 'have a name' do
+        page.should have_selector '.action#action-item-lamp-switch .name', text: 'switch'
+      end
+
+      it 'have a link' do
+        page.should have_selector '.action#action-item-lamp-switch a#do-item-lamp-switch'
+      end
+
+      it 'clicking link causes changes', :js => true do
+        sleep 3
+        page.should have_selector '.item#item-lamp .description', text: 'Lamp is off.'
+        click_on 'do-item-lamp-switch'
+        sleep 3
+        page.should have_selector '.item#item-lamp .doing',       text: 'Doing it!'
+        sleep 3
+        page.should have_selector '.item#item-lamp .description', text: 'Lamp is on.'
+      end
 
     end
 
@@ -329,9 +373,9 @@ describe Woyo::Server, :type => :feature  do
           window.should be_closed
           visit '/'
           click_on 'start'
-          page.should have_selector '.way#way_window a#go-window'
+          page.should have_selector '.way#way-window a#go-window'
           click_link 'go-window'
-          page.should have_selector '.way#way_window .going',        text: 'Makes no difference.' 
+          page.should have_selector '.way#way-window .going',        text: 'Makes no difference.' 
           page.should have_selector '.location#location-home .name', text: 'Home'
         end
 
