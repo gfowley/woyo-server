@@ -211,6 +211,9 @@ describe Woyo::Server, :type => :feature  do
             item :lamp do
               description on:  "Lamp is on.",
                           off: "Lamp is off."
+              attribute :doing  
+              doing       on:  'The lamp turns on.',
+                          off: 'The lamp turns off.'
               # todo... description light:   'A small lamp lights the table.',
               #                     default: 'A small lamp sits in darkness upon the table.'
               exclusion :light, :off, :on 
@@ -222,7 +225,7 @@ describe Woyo::Server, :type => :feature  do
               #            light !light
               #            {
               #              affected:    affected,
-              #              description: light ? 'The lamp flickers to life, casting a dim light on the table.' : 'The lamp turns off.'
+              #              description: light ? 'The lamp turns on.' : 'The lamp turns off.'
               #            }
               #          end
             end
@@ -249,7 +252,7 @@ describe Woyo::Server, :type => :feature  do
         page.should have_selector '.item#item-lamp .description', text: 'Lamp is off.'
         click_on 'do-item-lamp-switch'
         sleep 3
-        page.should have_selector '.item#item-lamp .doing',       text: 'Doing it!'
+        page.should have_selector '.item#item-lamp .doing',       text: 'The lamp turns on.'
         sleep 3
         page.should have_selector '.item#item-lamp .description', text: 'Lamp is on.'
       end

@@ -53,9 +53,19 @@ class Server < Sinatra::Application
   end
 
   get '/do/*/*/*' do |owner_type,owner_id,action_id|
-    world.locations[session[:location_id]].item( :lamp ).switch
-    content_type :json
-    { doing: 'Doing it!', change_location: true }.to_json
+    initial_location_id = session[:location_id]
+    location = world.locations[initial_location_id]
+    if location.children.include? owner_type.to_sym
+      owner = location.send( owner_type, owner_id.to_sym )
+      owner.send action_id
+      # action should return a hash containing...
+      #   location: id    # if moving to a new location
+      #   doing:    text  # description of action
+      #   changes:  hash of changed attributes and values  # directly changed by action,  manual list or automatic detection via registerd listeners?
+      #   affected: hash of affected attributes and values # hash attributes like 'description' select different value for changed attribute
+      content_type :json
+      { doing: owner.doing, change_location: true }.to_json
+    end
   end
   
 end
