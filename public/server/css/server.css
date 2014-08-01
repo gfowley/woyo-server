@@ -3,7 +3,7 @@ body {
   display:none;
 }
 
-p.doing {
+p.describe-actions {
   display:none;
   opacity:0;
   padding-left:1em;

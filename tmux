@@ -14,8 +14,8 @@ tmux new-window   -n rspec -d
 tmux send-keys    -t rspec "cd ." C-m
 tmux send-keys    -t rspec "rs --tag ~js" C-m
 
-tmux new-window   -n irb -d
-tmux send-keys    -t irb "cd ." C-m
-tmux send-keys    -t irb "bundle exec irb -r 'woyo/server'" C-m 
+tmux new-window   -n pry -d
+tmux send-keys    -t pry "cd ." C-m
+tmux send-keys    -t pry "bundle exec pry -r 'woyo/server'" C-m 
 tmux swap-window  -s vim -t shell
 

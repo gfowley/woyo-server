@@ -1,3 +1,3 @@
 module Woyo
-  SERVER_VERSION = "0.0.7"
+  SERVER_VERSION = "0.0.8"
 end

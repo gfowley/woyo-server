@@ -46,25 +46,29 @@ class Server < Sinatra::Application
   end
 
   get '/go/*' do |way_id|
+    content_type :json
     way = world.locations[session[:location_id]].ways[way_id.to_sym]
     session[:location_id] = way.to.id if way.open?
-    content_type :json
     way.go.to_json
   end
 
   get '/do/*/*/*' do |owner_type,owner_id,action_id|
+    content_type :json
     initial_location_id = session[:location_id]
     location = world.locations[initial_location_id]
     if location.children.include? owner_type.to_sym
       owner = location.send( owner_type, owner_id.to_sym )
-      owner.send action_id
-      # action should return a hash containing...
-      #   location: id    # if moving to a new location
-      #   doing:    text  # description of action
-      #   changes:  hash of changed attributes and values  # directly changed by action,  manual list or automatic detection via registerd listeners?
-      #   affected: hash of affected attributes and values # hash attributes like 'description' select different value for changed attribute
-      content_type :json
-      { doing: owner.doing, change_location: true }.to_json
+      result = owner.action( action_id.to_sym ).execute
+      # extract client-related info from execution hash
+      if result[:execution].kind_of?( Hash )
+        result[:changes] = result[:execution][:changes] ? Array(result[:execution][:changes]) : []
+        if result[:execution][:location]
+          session[:location_id] = result[:execution][:location]
+          result[:changes] << :location
+        end
+      end
+      result.delete :execution # execution info is for server only, do not pass to client
+      result.to_json  
     end
   end
   

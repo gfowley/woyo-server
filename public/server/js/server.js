@@ -49,15 +49,16 @@ $(document).ready( function() {
     owner = $("#" + $(this).parent().attr("owner_element"));
     do_url = $(this).attr("href");
     $.get( do_url, function(json) {
-      if ( json.doing.length > 0 ) {
+      // todo: handle multiple texts in describe array not just a string
+      if ( json.describe.length > 0 ) {
         owner
-        .children(".doing")
-        .text(json.doing)
+        .children(".describe-actions")
+        .text(json.describe)
         .slideDown(woyo.time.go_slide)
         .animate({opacity: 1}, woyo.time.go_fade)
         .delay(woyo.time.go_delay)
         .queue( function(next) {
-          if ( json.change_location == true ) {
+        if ( json.changes.length > 0 ) {
             $("body").fadeOut(woyo.time.page_out, function() {
               window.location.reload(true);
             });
@@ -65,7 +66,7 @@ $(document).ready( function() {
           next();
         });
       } else {
-        if ( json.change_location == true ) {
+        if ( json.changes.length > 0 ) {
           $("body").fadeOut(woyo.time.page_out, function() {
             window.location.reload(true);
           });

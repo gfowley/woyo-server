@@ -39,7 +39,11 @@ describe Woyo::Server, :type => :feature  do
         item :lamp do
           description 'A small lamp sits in darkness upon the table.'
           attribute light: false 
-          action( :switch ) { light !light }
+          action :switch do
+            execute do
+              light !light
+            end
+          end
         end
       end
       location :garden do
@@ -211,23 +215,19 @@ describe Woyo::Server, :type => :feature  do
             item :lamp do
               description on:  "Lamp is on.",
                           off: "Lamp is off."
-              attribute :doing  
-              doing       on:  'The lamp turns on.',
-                          off: 'The lamp turns off.'
-              # todo... description light:   'A small lamp lights the table.',
-              #                     default: 'A small lamp sits in darkness upon the table.'
               exclusion :light, :off, :on 
               action :switch do
-                on off  
+                description 'Turns the lamp on or off.'
+                exclusion :result, :off, :on
+                describe on:  'The lamp turns on.',
+                         off: 'The lamp turns off.'
+                execution do |this|
+                  this.on = on        # sync switch with lamp
+                  this.on = this.off  # toggle switch
+                  on = off            # toggle lamp
+                  { changes: :lamp }
+                end
               end
-              # todo...  track all affected attributes and registered listeners, return that list after action ?
-              # todo...  do
-              #            light !light
-              #            {
-              #              affected:    affected,
-              #              description: light ? 'The lamp turns on.' : 'The lamp turns off.'
-              #            }
-              #          end
             end
           end
         end
@@ -252,7 +252,7 @@ describe Woyo::Server, :type => :feature  do
         page.should have_selector '.item#item-lamp .description', text: 'Lamp is off.'
         click_on 'do-item-lamp-switch'
         sleep 3
-        page.should have_selector '.item#item-lamp .doing',       text: 'The lamp turns on.'
+        page.should have_selector '.item#item-lamp .describe-actions', text: 'The lamp turns on.'
         sleep 3
         page.should have_selector '.item#item-lamp .description', text: 'Lamp is on.'
       end
