@@ -222,9 +222,9 @@ describe Woyo::Server, :type => :feature  do
                 describe on:  'The lamp turns on.',
                          off: 'The lamp turns off.'
                 execution do |this|
-                  this.on = on        # sync switch with lamp
-                  this.on = this.off  # toggle switch
-                  on = off            # toggle lamp
+                  this.on on        # sync switch with lamp
+                  this.on this.off  # toggle switch
+                  on off            # toggle lamp
                   { changes: :lamp }
                 end
               end
