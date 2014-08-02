@@ -23,6 +23,7 @@ class Server < Sinatra::Application
 
   configure do
     enable :sessions
+    set :session_secret, SecureRandom.hex(16) 
     set root: '.'
     set views: Proc.new { File.join(root, "views/server") }
     set public_folder: Proc.new { File.join(root, "public/server") }
