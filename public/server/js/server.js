@@ -1,4 +1,25 @@
 
+App = Ember.Application.create();
+
+App.Router.map(function() {
+  this.resource('locations');
+  this.resource('location', { path: '/location/:location_id' });
+});
+
+App.LocationsRoute = Ember.Route.extend({
+  model: function() {
+    console.log('/locations');
+    return $.getJSON('/locations');
+  }
+});
+
+App.LocationRoute = Ember.Route.extend({
+  model: function(params) {
+    console.log('/location/'+params.location_id);
+    return $.getJSON('/location/'+params.location_id);
+  }
+});
+
 $(document).foundation();
 
 $(document).ready( function() {

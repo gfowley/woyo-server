@@ -1,15 +1,22 @@
-.row
-  .large-12.columns
-    .world
-      %h1.name= @world.name
-      %p.description= @world.description
 
-      .row
-        .large-12.columns
-          - if @world.start
-            .start
-              %a#start{ :href => "/location" } Start
-          - else
-            .no_start
-              %p No start location defined
+%script{ :type => "text/x-handlebars" }
+  <hr />
+  {{outlet}}
+  <hr />
+
+%script{ :type => "text/x-handlebars", :id => "index" }
+  {{link-to 'Locations' 'locations'}}
+
+%script{ :type => "text/x-handlebars", :id => "locations" }
+  <ul>
+  {{#each location in model}}
+  <li>{{link-to location.name 'location' location.id}}</li>
+  {{/each}}
+  </ul>
+
+%script{ :type => "text/x-handlebars", :id => "location" }
+  <div>
+  <h1>{{model.name}}</h1>
+  <p>{{model.description}}</p>
+  </div>
 

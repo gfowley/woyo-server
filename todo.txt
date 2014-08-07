@@ -1,5 +1,21 @@
 
-! Smooth transitions for going ways
+
+/ loads page
+  locations                           [ :id1, :id2, ... ]
+  location/:id                                              { id: :id, name: 'name' description: [ 'text1', 'text2', ... ] }
+  location/:id/ways                   [ :id1, :id2, ... ]
+  location/:id/way/:id                                      { id: :id, name: 'name', description: [ 'text1', 'text2', ... ], to: :to_id }
+  location/:id/items                  [ :id1, :id2, ... ]
+  location/:id/item/:id                                     { id: :id, name: 'name', description: [ 'text1', 'text2', ... ] }
+  location/:id/item/:id/actions       [ :id1, :id2, ... ]
+  location/:id/item/:id/actions/:id                         { id: :id, name: 'name', description: [ 'text1', 'text2', ... ] }
+    
+
+
+
+
+
+
 ! Multiline descriptions
     <br/>   => <br/>        # html in text    
     <br>    => <br/>        # html in text + fixup tag ?
@@ -8,13 +24,4 @@
     \n      => <br/>        # convert
     \n\n    => </p><p ... > # convert - set params for new paragraph
 
-Debugger
-Use haml tenplate for default page including layout.haml
-Test location description states
-Document DSL attributes and groups usage
-  -> way descriptions
-  -> way going
-  -> location descriptions
-Auto generate DSL docs from tests ?
-Test worlds in separate files - useful for manual testing
 

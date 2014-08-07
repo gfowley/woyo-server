@@ -38,13 +38,32 @@ class Server < Sinatra::Application
     redirect to 'default.html' if world.description.nil? && world.start.nil? # && world.name.nil? 
     @world = world
     session[:location_id] = world.start
+    haml :start
+  end
+
+  get '/world' do
     haml :world
   end
 
-  get '/location' do
-    @location = world.locations[session[:location_id]]
-    haml :location
+  get '/locations' do
+    content_type :json
+    world.locations.collect { |id,loc| { id: id, name: loc.name } }.to_json
   end
+
+  get '/location/*' do |id|
+    content_type :json
+    loc = world.location(id.to_sym)
+    {
+      id:          loc.id,
+      name:        loc.name,
+      description: loc.description
+    }.to_json
+  end
+
+  # get '/location' do
+  #   @location = world.locations[session[:location_id]]
+  #   haml :location
+  # end
 
   get '/go/*' do |way_id|
     content_type :json
