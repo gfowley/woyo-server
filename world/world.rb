@@ -5,7 +5,7 @@ description 'It\'s a small world after all...'
 start :home
 
 location :home do
-  description 'A place to start from'
+  description 'A good place to start.'
   way :out do
     to :outside
     description 'The outside world'

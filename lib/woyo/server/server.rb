@@ -1,5 +1,7 @@
 require 'sinatra/base'
 require 'sinatra/partial'
+require 'sinatra/json'
+require 'sinatra/reloader'
 require 'haml'
 require 'json'
 require 'woyo/world'
@@ -30,6 +32,11 @@ class Server < Sinatra::Application
     set world: self.load_world
   end
 
+  configure :development do
+   register Sinatra::Reloader
+   # also_reload 'world/*.rb' # will need a custom loader like self.load_world for individual files
+  end
+
   def world
     settings.world
   end
@@ -46,14 +53,12 @@ class Server < Sinatra::Application
   end
 
   get '/locations' do
-    content_type :json
-    world.locations.collect { |id,loc| { id: id, name: loc.name } }.to_json
+    json world.locations.collect { |id,loc| { id: id, name: loc.name } }
   end
 
   get '/location/*' do |id|
-    content_type :json
     loc = world.location(id.to_sym)
-    {
+    json( {
       id:           loc.id,
       name:         loc.name,
       description:  loc.description,
@@ -78,7 +83,7 @@ class Server < Sinatra::Application
                                       end
                       }
                     end
-    }.to_json
+    } )
   end
 
   # get '/location' do
