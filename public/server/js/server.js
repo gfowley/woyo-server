@@ -8,15 +8,17 @@ App.Router.map(function() {
 
 App.LocationsRoute = Ember.Route.extend({
   model: function() {
-    console.log('/locations');
-    return $.getJSON('/locations');
+    query = '/locations'
+    console.log(query);
+    return $.getJSON(query);
   }
 });
 
 App.LocationRoute = Ember.Route.extend({
   model: function(params) {
-    console.log('/location/'+params.location_id);
-    return $.getJSON('/location/'+params.location_id);
+    query = '/location/'+params.location_id
+    console.log(query);
+    return $.getJSON(query);
   }
 });
 

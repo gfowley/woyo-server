@@ -1,22 +1,43 @@
 
 %script{ :type => "text/x-handlebars" }
+  <div>
   <hr />
   {{outlet}}
   <hr />
+  </div>
 
 %script{ :type => "text/x-handlebars", :id => "index" }
+  <div>
   {{link-to 'Locations' 'locations'}}
+  </div>
 
 %script{ :type => "text/x-handlebars", :id => "locations" }
+  <div>
   <ul>
   {{#each location in model}}
   <li>{{link-to location.name 'location' location.id}}</li>
   {{/each}}
   </ul>
+  </div>
 
 %script{ :type => "text/x-handlebars", :id => "location" }
   <div>
   <h1>{{model.name}}</h1>
   <p>{{model.description}}</p>
+  <div>
+  {{#each item in model.items}}
+  <p>{{item.name}} : {{item.description}}</p>
+  <ul>
+  {{#each action in item.actions}}
+  <li>{{action.name}} : {{action.description}}</li>
+  {{/each}}
+  </ul>
+  {{/each}}
+  </div>
+  <div>
+  {{#each way in model.ways}}
+  <p>{{way.name}} : {{way.description}}</p>
+  {{/each}}
+  </div>
   </div>
 

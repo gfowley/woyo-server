@@ -18,6 +18,20 @@ location :home do
   item :table do
     description 'Wooden table'
   end
+  item :lamp do
+    description off: 'A dark lamp sits on the table', on: 'A lamp lights the table'
+    exclusion :light, :off, :on
+    action :turn_on do
+      description 'Turn on the lamp'
+      describe 'The lamp flickers to light'
+      execution { on! }
+    end
+    action :turn_off do
+      description 'Turn off the lamp'
+      describe 'The lamp turn off, darkness returns'
+      execution { off! }
+    end
+  end
   item :chair do
     description 'Simple chair'
   end

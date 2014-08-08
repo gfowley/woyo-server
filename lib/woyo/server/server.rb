@@ -54,9 +54,30 @@ class Server < Sinatra::Application
     content_type :json
     loc = world.location(id.to_sym)
     {
-      id:          loc.id,
-      name:        loc.name,
-      description: loc.description
+      id:           loc.id,
+      name:         loc.name,
+      description:  loc.description,
+      ways:         loc.ways.collect do |id,way|
+                      {
+                        id:           way.id,
+                        name:         way.name,
+                        description:  way.description
+                      }
+                    end,
+      items:        loc.items.collect do |id,item|
+                      {
+                        id:           item.id,
+                        name:         item.name,
+                        description:  item.description,
+                        actions:      item.actions.collect do |id,action|
+                                        {
+                                          id:          action.id,
+                                          name:        action.name,
+                                          description: action.description
+                                        }
+                                      end
+                      }
+                    end
     }.to_json
   end
 
