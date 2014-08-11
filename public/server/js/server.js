@@ -3,24 +3,39 @@ App = Ember.Application.create();
 
 App.Router.map(function() {
   this.resource('locations');
-  this.resource('location', { path: '/location/:location_id' });
+  this.resource('location', { path: ':location_id' });
+});
+
+App.Location = DS.Model.extend({
+  name:         DS.attr(),
+  description:  DS.attr(),
+  items:        DS.hasMany('item'), //,{async:true}),
+  ways:         DS.hasMany('way')   //,{async:true})
+});
+
+App.Item = DS.Model.extend({
+  location:     DS.belongsTo('location'),
+  name:         DS.attr(),
+  description:  DS.attr()
+});
+
+App.Way = DS.Model.extend({
+  location:     DS.belongsTo('location'),
+  name:         DS.attr(),
+  description:  DS.attr()
 });
 
 App.LocationsRoute = Ember.Route.extend({
   model: function() {
-    query = '/locations'
-    console.log(query);
-    return $.getJSON(query);
+    return this.store.find('location');
   }
 });
 
-App.LocationRoute = Ember.Route.extend({
-  model: function(params) {
-    query = '/location/'+params.location_id
-    console.log(query);
-    return $.getJSON(query);
-  }
-});
+// App.LocationRoute = Ember.Route.extend({
+//   model: function(params) {
+//     return this.store.find('location',params.location_id);
+//   }
+// });
 
 $(document).foundation();
 

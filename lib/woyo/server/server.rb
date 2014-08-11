@@ -52,39 +52,65 @@ class Server < Sinatra::Application
     haml :world
   end
 
-  get '/locations' do
-    json world.locations.collect { |id,loc| { id: id, name: loc.name } }
-  end
-
-  get '/location/*' do |id|
-    loc = world.location(id.to_sym)
-    json( {
-      id:           loc.id,
-      name:         loc.name,
-      description:  loc.description,
-      ways:         loc.ways.collect do |id,way|
+  get '/locations/?:id?' do |id|
+    id = id.to_sym unless id.nil?
+    locations = world.locations.select { |_,loc| id.nil? || ( loc.id == id ) }
+    json(
+      {
+        locations:  locations.collect do |_,loc|
                       {
-                        id:           way.id,
-                        name:         way.name,
-                        description:  way.description
+                        id:           loc.id,
+                        name:         loc.name,
+                        description:  loc.description,
+                        ways:         loc.ways.keys,
+                        items:        loc.items.keys
                       }
                     end,
-      items:        loc.items.collect do |id,item|
-                      {
-                        id:           item.id,
-                        name:         item.name,
-                        description:  item.description,
-                        actions:      item.actions.collect do |id,action|
-                                        {
-                                          id:          action.id,
-                                          name:        action.name,
-                                          description: action.description
-                                        }
-                                      end
-                      }
-                    end
-    } )
+        items:      locations.collect do |_,loc|
+                      loc.items.collect do |_,item|
+                        {
+                          id:           item.id,
+                          name:         item.name,
+                          description:  item.description
+                        }
+                      end
+                    end.flatten.uniq,
+        ways:       locations.collect do |_,loc|
+                      loc.ways.collect do |_,way|
+                        {
+                          id:           way.id,
+                          name:         way.name,
+                          description:  way.description
+                        }
+                      end
+                    end.flatten.uniq
+      }
+    )
   end
+
+=begin
+          ways: loc.ways.collect do |_,way|
+            {
+              id:           way.id,
+              name:         way.name,
+              description:  way.description
+            }
+          end,
+          items: loc.items.collect do |_,item|
+            {
+              id:           item.id,
+              name:         item.name,
+              description:  item.description
+            }
+          end
+    actions: item.actions.collect do |id,action|
+      {
+        id:          action.id,
+        name:        action.name,
+        description: action.description
+      }
+    end
+=end
 
   # get '/location' do
   #   @location = world.locations[session[:location_id]]
