@@ -35,16 +35,25 @@ class Server < Sinatra::Application
   configure :development do
    register Sinatra::Reloader
    # also_reload 'world/*.rb' # will need a custom loader like self.load_world for individual files
+   require 'pry'
   end
 
   def world
-    settings.world
+    @world = settings.world
+  end
+
+  def location
+    @location = world.locations[session[:location_id]]
+  end
+
+  def set_location id
+    session[:location_id] = id
+    location 
   end
 
   get '/' do
     redirect to 'default.html' if world.description.nil? && world.start.nil? # && world.name.nil? 
-    @world = world
-    session[:location_id] = world.start
+    set_location world.start
     haml :start
   end
 
@@ -54,6 +63,7 @@ class Server < Sinatra::Application
 
   get '/locations/?:id?' do |id|
     id = id.to_sym unless id.nil?
+    set_location world.start
     locations = world.locations.select { |_,loc| id.nil? || ( loc.id == id ) }
     json(
       {
@@ -65,44 +75,46 @@ class Server < Sinatra::Application
                         ways:         loc.ways.keys,
                         items:        loc.items.keys
                       }
-                    end,
-        items:      locations.collect do |_,loc|
-                      loc.items.collect do |_,item|
-                        {
-                          id:           item.id,
-                          name:         item.name,
-                          description:  item.description
-                        }
-                      end
-                    end.flatten.uniq,
-        ways:       locations.collect do |_,loc|
-                      loc.ways.collect do |_,way|
-                        {
-                          id:           way.id,
-                          name:         way.name,
-                          description:  way.description
-                        }
-                      end
-                    end.flatten.uniq
+                    end
       }
     )
   end
 
-=begin
-          ways: loc.ways.collect do |_,way|
-            {
-              id:           way.id,
-              name:         way.name,
-              description:  way.description
-            }
-          end,
-          items: loc.items.collect do |_,item|
+  get '/items' do
+    ids = params[:ids]
+    if ids && ! ids.empty?
+      json(
+        {
+          items: location.items.collect do |_,item|
             {
               id:           item.id,
               name:         item.name,
               description:  item.description
             }
-          end
+          end.compact.uniq
+        }
+      )
+    end
+  end
+
+  get '/ways' do
+    ids = params[:ids]
+    if ids && ! ids.empty?
+      json(
+        {
+          ways: location.ways.collect do |_,way|
+            {
+              id:           way.id,
+              name:         way.name,
+              description:  way.description
+            }
+          end.compact.uniq
+        }
+      )
+    end
+  end
+
+=begin
     actions: item.actions.collect do |id,action|
       {
         id:          action.id,

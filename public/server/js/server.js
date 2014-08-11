@@ -9,8 +9,8 @@ App.Router.map(function() {
 App.Location = DS.Model.extend({
   name:         DS.attr(),
   description:  DS.attr(),
-  items:        DS.hasMany('item'), //,{async:true}),
-  ways:         DS.hasMany('way')   //,{async:true})
+  items:        DS.hasMany('item',{async:true}),
+  ways:         DS.hasMany('way', {async:true})
 });
 
 App.Item = DS.Model.extend({
