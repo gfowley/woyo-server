@@ -24,22 +24,35 @@
   <div>
   <h1>{{model.name}}</h1>
   <p>{{model.description}}</p>
-  <div>
   {{#each item in model.items}}
-  <p>{{item.name}} : {{item.description}}</p>
+  <div {{bind-attr id=item.div_id}}>
+  <p class="description">{{item.name}} : {{item.description}}</p>
+  <p class="describe-actions"></p>
   <ul>
   {{#each action in item.actions}}
-  <li>{{action.name}} : {{action.description}}</li>
+  <li {{bind-attr id=action.li_id owner_element=item.div_id}}>
+  <a class="do" {{bind-attr id=action.a_id href=action.a_href}}>{{action.name}} : {{action.description}}</a>
+  </li>
   {{/each}}
   </ul>
-  {{/each}}
   </div>
-  <div>
+  {{/each}}
   {{#each way in model.ways}}
   <p>{{way.name}} : {{way.description}}</p>
   {{/each}}
   </div>
-  </div>
+
+-# .item{ :id => "item-#{item.id}" }
+-#   %p.description= item.description
+-#   %p.describe-actions
+-#   = partial :actions, locals: { owner: item }
+
+-# %ul.actions
+-#   - owner_type = owner.class.name.split('::').last.downcase
+-#   - owner.actions.names.each do |action|
+-#     %li.action{ :id => "action-#{owner_type}-#{owner.id}-#{action}", :owner_element => "#{owner_type}-#{owner.id}" }
+-#       %a.do{ :id => "do-#{owner_type}-#{owner.id}-#{action}", :href => "/do/#{owner_type}/#{owner.id}/#{action}" }
+-#         %span.name= action
 
 %script{ :type => "text/javascript" }
   = "var initial_location_id = '#{@location.id}';"

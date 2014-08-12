@@ -103,13 +103,24 @@ class Server < Sinatra::Application
       items = location.items.select { |_,item| ids.include? item.id }
       json(
         {
-          items: items.collect do |_,item|
-            {
-              id:           item.id,
-              name:         item.name,
-              description:  item.description
-            }
-          end.compact.uniq
+          items:    items.collect do |_,item|
+                      {
+                        id:           item.id,
+                        name:         item.name,
+                        description:  item.description,
+                        actions:      item.actions.keys
+                      }
+                    end.compact.uniq,
+          actions:  items.collect do |_,item|
+                      item.actions.collect do |_,action|
+                      {
+                        item:        item.id,
+                        id:          action.id,
+                        name:        action.name,
+                        description: action.description
+                      }
+                      end
+                    end.flatten.compact.uniq
         }
       )
     end
@@ -133,16 +144,6 @@ class Server < Sinatra::Application
       )
     end
   end
-
-=begin
-    actions: item.actions.collect do |id,action|
-      {
-        id:          action.id,
-        name:        action.name,
-        description: action.description
-      }
-    end
-=end
 
   # get '/location' do
   #   @location = world.locations[session[:location_id]]
