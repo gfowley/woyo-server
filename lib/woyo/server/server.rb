@@ -10,7 +10,9 @@ module Woyo
 
 class Server < Sinatra::Application
 
-  def self.load_world glob = 'world/*.rb' 
+  WORLD_FILES = 'world/**/*.rb' 
+
+  def self.load_world glob = WORLD_FILES
     world = Woyo::World.new
     Dir[glob].each do |filename|
       eval_world File.read( filename ), filename, world
@@ -24,8 +26,9 @@ class Server < Sinatra::Application
   end
 
   configure do
+    # todo: sessions with server-side store instead of cookie
     enable :sessions
-    set :session_secret, SecureRandom.hex(16) 
+    set session_secret: SecureRandom.hex(16) 
     set root: '.'
     set views: Proc.new { File.join(root, "views/server") }
     set public_folder: Proc.new { File.join(root, "public/server") }
@@ -34,8 +37,17 @@ class Server < Sinatra::Application
 
   configure :development do
    register Sinatra::Reloader
-   # also_reload 'world/*.rb' # will need a custom loader like self.load_world for individual files
    require 'pry'
+  end
+
+  def reload_world_changes
+    # todo: get and track file adds, deletes, mtimes in WORLD_FILES 
+  end
+
+  before do
+    if settings.development?
+      reload_world_changes
+    end
   end
 
   def world
@@ -57,13 +69,17 @@ class Server < Sinatra::Application
     haml :start
   end
 
-  get '/world' do
-    haml :world
+  get '/play' do
+    location
+    haml :play
   end
 
   get '/locations/?:id?' do |id|
-    id = id.to_sym unless id.nil?
-    set_location world.start
+    if false  # admin?
+      id = id.to_sym unless id.nil?   # admin can access any or all locations
+    else
+      id = location.id # player can access current location only
+    end
     locations = world.locations.select { |_,loc| id.nil? || ( loc.id == id ) }
     json(
       {
@@ -83,9 +99,11 @@ class Server < Sinatra::Application
   get '/items' do
     ids = params[:ids]
     if ids && ! ids.empty?
+      ids = ids.collect { |id| id.to_sym }
+      items = location.items.select { |_,item| ids.include? item.id }
       json(
         {
-          items: location.items.collect do |_,item|
+          items: items.collect do |_,item|
             {
               id:           item.id,
               name:         item.name,
@@ -100,6 +118,8 @@ class Server < Sinatra::Application
   get '/ways' do
     ids = params[:ids]
     if ids && ! ids.empty?
+      ids = ids.collect { |id| id.to_sym }
+      ways = location.ways.select { |_,way| ids.include? way.id }
       json(
         {
           ways: location.ways.collect do |_,way|

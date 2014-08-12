@@ -6,19 +6,19 @@
   <hr />
   </div>
 
-%script{ :type => "text/x-handlebars", :id => "index" }
-  <div>
-  {{link-to 'Locations' 'locations'}}
-  </div>
+-# %script{ :type => "text/x-handlebars", :id => "index" }
+-#   <div>
+-#   {{outlet}}
+-#   </div>
 
-%script{ :type => "text/x-handlebars", :id => "locations" }
-  <div>
-  <ul>
-  {{#each location in model}}
-  <li>{{link-to location.name 'location' location.id}}</li>
-  {{/each}}
-  </ul>
-  </div>
+-# %script{ :type => "text/x-handlebars", :id => "locations" }
+-#   <div>
+-#   <ul>
+-#   {{#each location in model}}
+-#   <li>{{link-to location.name 'location' location.id}}</li>
+-#   {{/each}}
+-#   </ul>
+-#   </div>
 
 %script{ :type => "text/x-handlebars", :id => "location" }
   <div>
@@ -40,4 +40,9 @@
   {{/each}}
   </div>
   </div>
+
+%script{ :type => "text/javascript" }
+  = "var initial_location_id = '#{@location.id}';"
+
+%script{ :src => "/js/play.js" }
 
