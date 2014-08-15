@@ -27,12 +27,12 @@
   {{#each item in model.items}}
   <div {{bind-attr id=item.div_id}}>
   <p class="description">{{item.name}} : {{item.description}}</p>
-  <p class="describe-actions"></p>
+  {{#each action in item.actions}}
+  <p class="describe-action">{{action.execution.describe}}</p>
+  {{/each}}
   <ul>
   {{#each action in item.actions}}
-  <li {{bind-attr id=action.li_id owner_element=item.div_id}}>
-  <a class="do" {{bind-attr id=action.a_id href=action.a_href}}>{{action.name}} : {{action.description}}</a>
-  </li>
+  <li class="action"><a {{action 'execute' action}}>{{action.name}} : {{action.description}}</a></li>
   {{/each}}
   </ul>
   </div>

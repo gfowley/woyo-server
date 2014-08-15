@@ -3,22 +3,25 @@ App = Ember.Application.create({
   LOG_TRANSITIONS: true
 });
 
-App.Router.map(function() {
-  // this.resource('locations');
-  this.resource('location', { path: '/location/:location_id' });
-});
-
 App.IndexRoute = Ember.Route.extend({
   beforeModel: function() {
     this.transitionTo('location', initial_location_id);
   }
 });
 
-// App.LocationsRoute = Ember.Route.extend({
-//   model: function() {
-//     return this.store.find('location');
-//   }
-// });
+App.Router.map(function() {
+  this.resource('location', { path: '/location/:location_id' });
+});
+
+App.LocationController = Ember.ObjectController.extend({
+  actions: {
+    execute: function(e) {
+      e.get('execution').reload().then( function(e) {
+        e.get('action').get('item').set('description', "**** IT WORKS ****");
+      })
+    }
+  }
+});
 
 App.LocationRoute = Ember.Route.extend({
   model: function(params) {
@@ -51,9 +54,13 @@ App.Action = DS.Model.extend({
   item:         DS.belongsTo('item'),
   name:         DS.attr(),
   description:  DS.attr(),
-  li_id:        function() { return 'action-item-' + this.get('item').id + '-' + this.get('id'); }.property('id'),
-  a_id:         function() { return 'do-item-'     + this.get('item').id + '-' + this.get('id'); }.property('id'),
-  a_href:       function() { return '/do/item/'    + this.get('item').id + '/' + this.get('id'); }.property('id')
+  execution:    DS.belongsTo('execution', {async:false})
+});
+
+App.Execution = DS.Model.extend({
+  action:       DS.belongsTo('action'),
+  result:       DS.attr(),
+  describe:     DS.attr()
 });
 
 $(document).ready( function() {
