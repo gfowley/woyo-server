@@ -75,12 +75,10 @@ class Server < Sinatra::Application
   end
 
   get '/locations/?:id?' do |id|
-    if false  # admin?
-      id = id.to_sym unless id.nil?   # admin can access any or all locations
-    else
-      id = location.id # player can access current location only
-    end
-    locations = world.locations.select { |_,loc| id.nil? || ( loc.id == id ) }
+    ids = id ? [ id.to_sym ] : params[:ids] 
+    ids = [ location.id ] unless false  # unless admin? a player can access current location only
+    ids = ids.collect { |id| id.to_sym }
+    locations = world.locations.select { |_,loc| ids.include? loc.id }     # old - id.nil? || ( loc.id == id ) }
     json(
       {
         locations:  locations.collect do |_,loc|
@@ -97,11 +95,7 @@ class Server < Sinatra::Application
   end
 
   get '/items/?:id?' do |id|
-    if id.nil?
-      ids = params[:ids]
-    else
-      ids = [ id.to_sym ]
-    end
+    ids = id ? [ id.to_sym ] : params[:ids] 
     if ids && ! ids.empty?
       ids = ids.collect { |id| id.to_sym }
       items = location.items.select { |_,item| ids.include? item.id }
@@ -140,11 +134,7 @@ class Server < Sinatra::Application
   end
 
   get '/ways/?:id?' do |id|
-    if id.nil?
-      ids = params[:ids]
-    else
-      ids = [ id.to_sym ]
-    end
+    ids = id ? [ id.to_sym ] : params[:ids] 
     if ids && ! ids.empty?
       ids = ids.collect { |id| id.to_sym }
       ways = location.ways.select { |_,way| ids.include? way.id }

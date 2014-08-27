@@ -18,15 +18,29 @@ App.LocationController = Ember.ObjectController.extend({
     execute: function(action) {
       var that = this;
       action.get('execution').reload().then( function(execution) {
-        //  execution.get('action').get('item').set('description', execution.get('changes').item.lamp.description);
-        //  this updates the action.describe field too quickly, howto delay promise ?
-        that.get('model').reload();
-        that.get('model').get('items').invoke('reload');
-        that.get('model').get('ways' ).invoke('reload');
+        // todo: assign model fields values from execution[:changes] instead of reloading whole location
+        // howto set transitions for ember bound fields ?
+        setTimeout(function(){
+          that.get('model').reload();
+          that.get('model').get('items').invoke('reload');
+          that.get('model').get('ways' ).invoke('reload');
+        }, woyo.time.action_delay);
       })
     }
   }
 });
+
+App.LocationView = Ember.View.extend({
+    willAnimateIn : function () {
+        this.$().css("opacity", 0);
+    },
+    animateIn : function (done) {
+        this.$().fadeTo(woyo.time.page_in, 1, done);
+    },
+    animateOut : function (done) {
+        this.$().fadeTo(woyo.time.page_out, 0, done);
+    }
+})
 
 App.LocationRoute = Ember.Route.extend({
   model: function(params) {
@@ -68,6 +82,12 @@ App.Execution = DS.Model.extend({
   describe:     DS.attr(),
   changes:      DS.attr()
 });
+
+function hold(delay_time){
+  var dfd = $.Deferred();
+  setTimeout(function(){ dfd.resolve(); }, delay_time);
+  return dfd.promise();
+}
 
 $(document).ready( function() {
 
