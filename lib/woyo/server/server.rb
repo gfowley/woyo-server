@@ -96,8 +96,12 @@ class Server < Sinatra::Application
     )
   end
 
-  get '/items' do
-    ids = params[:ids]
+  get '/items/?:id?' do |id|
+    if id.nil?
+      ids = params[:ids]
+    else
+      ids = [ id.to_sym ]
+    end
     if ids && ! ids.empty?
       ids = ids.collect { |id| id.to_sym }
       items = location.items.select { |_,item| ids.include? item.id }
@@ -135,8 +139,12 @@ class Server < Sinatra::Application
     end
   end
 
-  get '/ways' do
-    ids = params[:ids]
+  get '/ways/?:id?' do |id|
+    if id.nil?
+      ids = params[:ids]
+    else
+      ids = [ id.to_sym ]
+    end
     if ids && ! ids.empty?
       ids = ids.collect { |id| id.to_sym }
       ways = location.ways.select { |_,way| ids.include? way.id }
@@ -156,14 +164,11 @@ class Server < Sinatra::Application
 
   get '/executions/*/*/*' do |owner_type,owner_id,action_id|
     content_type :json
-    # initial_location_id = session[:location_id]
-    # location = world.locations[initial_location_id]
     if location.children.include? owner_type.to_sym
       owner = location.send( owner_type, owner_id.to_sym )
       result = owner.action( action_id.to_sym ).execute
       # extract client-related info from execution hash
       if result[:execution].kind_of?( Hash )
-        # todo: collect changed attributes automatically instead of reporting manually in execution result
         result[:changes] = result[:execution][:changes] ? Array(result[:execution][:changes]) : []
         # todo: detect location change in #execute
         if result[:execution][:location]

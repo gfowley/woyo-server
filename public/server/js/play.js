@@ -15,9 +15,14 @@ App.Router.map(function() {
 
 App.LocationController = Ember.ObjectController.extend({
   actions: {
-    execute: function(e) {
-      e.get('execution').reload().then( function(e) {
-        e.get('action').get('item').set('description', "**** IT WORKS ****");
+    execute: function(action) {
+      var that = this;
+      action.get('execution').reload().then( function(execution) {
+        //  execution.get('action').get('item').set('description', execution.get('changes').item.lamp.description);
+        //  this updates the action.describe field too quickly, howto delay promise ?
+        that.get('model').reload();
+        that.get('model').get('items').invoke('reload');
+        that.get('model').get('ways' ).invoke('reload');
       })
     }
   }
@@ -60,7 +65,8 @@ App.Action = DS.Model.extend({
 App.Execution = DS.Model.extend({
   action:       DS.belongsTo('action'),
   result:       DS.attr(),
-  describe:     DS.attr()
+  describe:     DS.attr(),
+  changes:      DS.attr()
 });
 
 $(document).ready( function() {

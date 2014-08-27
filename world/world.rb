@@ -28,7 +28,7 @@ location :home do
     end
     action :turn_off do
       description 'Turn off the lamp'
-      describe 'The lamp turn off, darkness returns'
+      describe 'The lamps turn off, darkness returns'
       execution { off! }
     end
   end

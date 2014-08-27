@@ -31,8 +31,8 @@
   <p class="describe-action">{{action.execution.describe}}</p>
   {{/each}}
   <ul>
-  {{#each action in item.actions}}
-  <li class="action"><a {{action 'execute' action}}>{{action.name}} : {{action.description}}</a></li>
+  {{#each item_action in item.actions}}
+  <li class="action"><a {{action 'execute' item_action}}>{{item_action.name}} : {{item_action.description}}</a></li>
   {{/each}}
   </ul>
   </div>
