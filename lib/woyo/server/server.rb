@@ -2,7 +2,7 @@ require 'sinatra/base'
 require 'sinatra/partial'
 require 'sinatra/json'
 require 'sinatra/reloader'
-require 'haml'
+require 'erb'
 require 'json'
 require 'woyo/world'
 
@@ -66,12 +66,12 @@ class Server < Sinatra::Application
   get '/' do
     redirect to 'default.html' if world.description.nil? && world.start.nil? # && world.name.nil? 
     set_location world.start
-    haml :start
+    erb :start
   end
 
   get '/play' do
     location
-    haml :play
+    erb :play
   end
 
   get '/locations/?:id?' do |id|
@@ -184,31 +184,6 @@ class Server < Sinatra::Application
     way.go.to_json
   end
 
-  # get '/location' do
-  #   @location = world.locations[session[:location_id]]
-  #   haml :location
-  # end
-
-  # get '/do/*/*/*' do |owner_type,owner_id,action_id|
-  #   content_type :json
-  #   initial_location_id = session[:location_id]
-  #   location = world.locations[initial_location_id]
-  #   if location.children.include? owner_type.to_sym
-  #     owner = location.send( owner_type, owner_id.to_sym )
-  #     result = owner.action( action_id.to_sym ).execute
-  #     # extract client-related info from execution hash
-  #     if result[:execution].kind_of?( Hash )
-  #       result[:changes] = result[:execution][:changes] ? Array(result[:execution][:changes]) : []
-  #       if result[:execution][:location]
-  #         session[:location_id] = result[:execution][:location]
-  #         result[:changes] << :location
-  #       end
-  #     end
-  #     result.delete :execution # execution info is for server only, do not pass to client
-  #     result.to_json  
-  #   end
-  # end
-  
 end
 
 end

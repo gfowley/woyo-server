@@ -1,0 +1,37 @@
+<html>
+
+  <head>
+
+    <meta charset="utf-8"></meta> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta> 
+    <link rel="stylesheet" href="/foundation-5.2.2/css/foundation.css"></link>
+    <link rel="stylesheet" href="/css/server.css"></link>
+    <script src="/foundation-5.2.2/js/vendor/modernizr.js"></script>
+
+    <title>
+      <%= case  
+          when @world 
+            @world.name
+          when @location
+            @location.name
+          end %>
+    </title>
+
+  </head>
+
+  <body>
+
+    <script src="/foundation-5.2.2/js/vendor/jquery.js"/></script>
+    <script src="/foundation-5.2.2/js/foundation.min.js"></script>
+    <script src="/handlebars-1.1.2/handlebars.js"></script>
+    <script src="/ember-1.7.0/ember.js"></script>
+    <script src="/ember-data-1.0.0-beta.9/ember-data.js"></script>
+    <script src="/ember-animate-0.3.5/ember-animate.js"></script>
+    <script src="/js/server.js"></script>
+
+    <%= yield %>
+
+  </body>
+
+</html>
+

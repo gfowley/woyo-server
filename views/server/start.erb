@@ -1,0 +1,22 @@
+<div class="row">
+  <div class="large-12 columns">
+    <div class="world">
+
+      <h1 class="name"><%= @world.name %></h1>
+      <p class="description"><%= @world.description %></p>
+
+      <div class="row">
+        <div class="large-12 columns">
+          <% if @world.start %>
+          <div class="start">
+            <a id="start"href="/play">Start</a>
+          <% else %>
+          <div class="no_start">
+            <p>No start location defined</p>
+          </div>
+        <% end %>
+      </div>
+
+    </div>
+  </div>
+</div>

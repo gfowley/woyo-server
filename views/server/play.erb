@@ -1,0 +1,48 @@
+
+<script type="text/x-handlebars">
+  <div>
+    <hr/>
+      {{outlet}}
+    <hr/>
+  </div>
+</script>
+
+<script type="text/x-handlebars" id="location">
+  <div>
+    <h1>{{model.name}}</h1>
+    <p>{{model.description}}</p>
+    {{#each item in model.items}}
+      <div {{bind-attr id=item.div_id}}>
+        <p class="description">{{item.name}} : {{item.description}}</p>
+        {{#each action in item.actions}}
+          <p class="describe-action">{{action.execution.describe}}</p>
+        {{/each}}
+        <ul>
+          {{#each item_action in item.actions}}
+            <li class="action"><a {{action 'execute' item_action}}>{{item_action.name}} : {{item_action.description}}</a></li>
+          {{/each}}
+        </ul>
+      </div>
+    {{/each}}
+    {{#each way in model.ways}}
+      <p>{{way.name}} : {{way.description}}</p>
+    {{/each}}
+  </div>
+</script>
+
+<script type="text/javascript">
+  <%= "var initial_location_id = '#{@location.id}';" %>
+</script>
+
+<script src="/js/play.js"></script>
+
+<%#
+.row
+  .large-12.columns
+    .way{ :id => "way-#{way.id}" }
+      %a.go{ :id => "go-#{way.id}", :href => "/go/#{way.id}" }
+      %p.description= way.description
+    %p.going
+%>
+
+

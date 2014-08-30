@@ -13,6 +13,9 @@ App.Router.map(function() {
   this.resource('location', { path: '/location/:location_id' });
 });
 
+
+// location
+
 App.LocationController = Ember.ObjectController.extend({
   actions: {
     execute: function(action) {
@@ -55,6 +58,8 @@ App.Location = DS.Model.extend({
   ways:         DS.hasMany('way',  {async:true})
 });
 
+// other models
+
 App.Item = DS.Model.extend({
   location:     DS.belongsTo('location'),
   name:         DS.attr(),
@@ -76,12 +81,20 @@ App.Action = DS.Model.extend({
   execution:    DS.belongsTo('execution', {async:false})
 });
 
+// execution
+
+// App.ExecutionView = Ember.View.extend({
+//   templateName: 'execution'
+// })
+
 App.Execution = DS.Model.extend({
   action:       DS.belongsTo('action'),
   result:       DS.attr(),
   describe:     DS.attr(),
   changes:      DS.attr()
 });
+
+// functions
 
 function hold(delay_time){
   var dfd = $.Deferred();
