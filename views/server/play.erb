@@ -7,27 +7,43 @@
   </div>
 </script>
 
-<script type="text/x-handlebars" id="location">
+<script type="text/x-handlebars" data-template-name="location">
   <div>
-    <h1>{{model.name}}</h1>
-    <p>{{model.description}}</p>
-    {{#each item in model.items}}
-      <div {{bind-attr id=item.div_id}}>
-        <p class="description">{{item.name}} : {{item.description}}</p>
-        {{#each action in item.actions}}
-          <p class="describe-action">{{action.execution.describe}}</p>
-        {{/each}}
-        <ul>
-          {{#each item_action in item.actions}}
-            <li class="action"><a {{action 'execute' item_action}}>{{item_action.name}} : {{item_action.description}}</a></li>
-          {{/each}}
-        </ul>
-      </div>
+    <h1>{{name}}</h1>
+    <p>{{description}}</p>
+    {{#each item in items}}
+      {{render "item" item}}
     {{/each}}
-    {{#each way in model.ways}}
-      <p>{{way.name}} : {{way.description}}</p>
+    {{#each way in ways}}
+      {{render "way" way}}
     {{/each}}
   </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="item">
+  <div {{bind-attr id=item.div_id}}>
+    <p class="description">{{name}} : {{description}}</p>
+    {{#each action in actions}}
+      {{render "execution" action.execution}}
+    {{/each}}
+    <ul>
+      {{#each action in actions}}
+        {{render "action" action}}
+      {{/each}}
+    </ul>
+  </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="action">
+  <li class="action"><a {{action 'execute'}}>{{name}} : {{description}}</a></li>
+</script>
+
+<script type="text/x-handlebars" data-template-name="execution">
+  <p class="describe-action">{{describe}}</p>
+</script>
+
+<script type="text/x-handlebars" data-template-name="way">
+  <p>{{name}} : {{description}}</p>
 </script>
 
 <script type="text/javascript">

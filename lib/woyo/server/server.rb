@@ -103,6 +103,7 @@ class Server < Sinatra::Application
         {
           items:      items.collect do |_,item|
                         {
+                          location:     location.id,
                           id:           item.id,
                           name:         item.name,
                           description:  item.description,
@@ -112,7 +113,7 @@ class Server < Sinatra::Application
           actions:    items.collect do |_,item|
                         item.actions.collect do |_,action|
                           {
-                            item:        item.id,   # wtf: can ember figure this out itself ?
+                            item:        item.id,
                             id:          action.id,
                             name:        action.name,
                             description: action.description,
@@ -123,7 +124,7 @@ class Server < Sinatra::Application
           executions: items.collect do |_,item|
                         item.actions.collect do |_,action|
                           {
-                            action:      action.id, # wtf: can ember figure this out itself ?
+                            action:      action.id,
                             id:          "item/#{item.id}/#{action.id}"
                           }
                         end   # empty execution so action will not be executed until clicked
@@ -142,6 +143,7 @@ class Server < Sinatra::Application
         {
           ways: location.ways.collect do |_,way|
             {
+              location:     location.id,
               id:           way.id,
               name:         way.name,
               description:  way.description
