@@ -1,49 +1,69 @@
 
 <script type="text/x-handlebars">
-  <div>
-    <hr/>
+  <div class="row">
+    <div class="large-12 columns">
       {{outlet}}
-    <hr/>
+    </div>
   </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="location">
-  <div>
-    <h1>{{name}}</h1>
-    <p>{{description}}</p>
-    {{#each item in items}}
-      {{render "item" item}}
-    {{/each}}
-    {{#each way in ways}}
-      {{render "way" way}}
-    {{/each}}
+  <div class="row">
+    <div class="large-12 columns">
+      <h1>{{name}}</h1>
+      <p>{{description}}</p>
+      {{#each item in items}}
+        {{render "item" item}}
+      {{/each}}
+      {{#each way in ways}}
+        {{render "way" way}}
+      {{/each}}
+    </div>
   </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="item">
-  <div {{bind-attr id=item.div_id}}>
-    <p class="description">{{name}} : {{description}}</p>
-    {{#each action in actions}}
-      {{render "execution" action.execution}}
-    {{/each}}
-    <ul>
-      {{#each action in actions}}
-        {{render "action" action}}
-      {{/each}}
-    </ul>
+  <div class="row">
+    <div class="large-12 columns">
+      <div {{bind-attr id=item.div_id}}>
+        <p class="description">{{description}}</p>
+        {{#each action in actions}}
+          {{render "execution" action.execution}}
+        {{/each}}
+        <ul>
+          {{#each action in actions}}
+            {{render "action" action}}
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="way">
+  <div class="row">
+    <div class="large-12 columns">
+      <div {{bind-attr id=way.div_id}}>
+        <p class="description">{{description}}</p>
+        {{#each action in actions}}
+          {{render "execution" action.execution}}
+        {{/each}}
+        <ul>
+          {{#each action in actions}}
+            {{render "action" action}}
+          {{/each}}
+        </ul>
+      </div>
+    </div>
   </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="action">
-  <li class="action"><a {{action 'execute'}}>{{name}} : {{description}}</a></li>
+  <li class="action"><a {{action 'execute'}}>{{display_description}}</a></li>
 </script>
 
 <script type="text/x-handlebars" data-template-name="execution">
-  <p class="describe-action">{{describe}}</p>
-</script>
-
-<script type="text/x-handlebars" data-template-name="way">
-  <p>{{name}} : {{description}}</p>
+  <p class="describe-execution">{{display_describe}}</p>
 </script>
 
 <script type="text/javascript">
@@ -51,14 +71,4 @@
 </script>
 
 <script src="/js/play.js"></script>
-
-<%#
-.row
-  .large-12.columns
-    .way{ :id => "way-#{way.id}" }
-      %a.go{ :id => "go-#{way.id}", :href => "/go/#{way.id}" }
-      %p.description= way.description
-    %p.going
-%>
-
 

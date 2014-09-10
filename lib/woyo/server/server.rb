@@ -81,15 +81,15 @@ class Server < Sinatra::Application
     locations = world.locations.select { |_,loc| ids.include? loc.id }     # old - id.nil? || ( loc.id == id ) }
     json(
       {
-        locations:  locations.collect do |_,loc|
-                      {
-                        id:           loc.id,
-                        name:         loc.name,
-                        description:  loc.description,
-                        ways:         loc.ways.keys,
-                        items:        loc.items.keys
-                      }
-                    end
+        locations: locations.collect do |_,loc|
+          {
+            id:           loc.id,
+            name:         loc.name,
+            description:  loc.description,
+            ways:         loc.ways.keys,
+            items:        loc.items.keys
+          }
+        end
       }
     )
   end
@@ -101,34 +101,34 @@ class Server < Sinatra::Application
       items = location.items.select { |_,item| ids.include? item.id }
       json(
         {
-          items:      items.collect do |_,item|
-                        {
-                          location:     location.id,
-                          id:           item.id,
-                          name:         item.name,
-                          description:  item.description,
-                          actions:      item.actions.keys
-                        }
-                      end.compact.uniq,
-          actions:    items.collect do |_,item|
-                        item.actions.collect do |_,action|
-                          {
-                            item:        item.id,
-                            id:          action.id,
-                            name:        action.name,
-                            description: action.description,
-                            execution:   "item/#{item.id}/#{action.id}"
-                          }
-                        end
-                      end.flatten.compact.uniq,
+          items: items.collect do |_,item|
+            {
+              location:     location.id,
+              id:           item.id,
+              name:         item.name,
+              description:  item.description,
+              actions:      item.actions.collect { |_,action| "#{item.id}-#{action.id}" }
+            }
+          end.compact.uniq,
+          actions: items.collect do |_,item|
+            item.actions.collect do |_,action|
+              {
+                item:        item.id,
+                id:          "#{item.id}-#{action.id}",
+                name:        action.name,
+                description: action.description,
+                execution:   "item/#{item.id}/#{action.id}"
+              }
+            end
+          end.flatten.compact.uniq,
           executions: items.collect do |_,item|
-                        item.actions.collect do |_,action|
-                          {
-                            action:      action.id,
-                            id:          "item/#{item.id}/#{action.id}"
-                          }
-                        end   # empty execution so action will not be executed until clicked
-                      end.flatten.compact.uniq
+            item.actions.collect do |_,action|
+              {
+                action:      "#{item.id}-#{action.id}",
+                id:          "item/#{item.id}/#{action.id}"
+              }
+            end   # empty execution so action will not be executed until clicked
+          end.flatten.compact.uniq
         }
       )
     end
@@ -141,14 +141,34 @@ class Server < Sinatra::Application
       ways = location.ways.select { |_,way| ids.include? way.id }
       json(
         {
-          ways: location.ways.collect do |_,way|
+          ways: ways.collect do |_,way|
             {
               location:     location.id,
               id:           way.id,
               name:         way.name,
-              description:  way.description
+              description:  way.description,
+              actions:      way.actions.collect { |_,action| "#{way.id}-#{action.id}" }
             }
-          end.compact.uniq
+          end.compact.uniq,
+          actions: ways.collect do |_,way|
+            way.actions.collect do |_,action|
+              {
+                way:         way.id,
+                id:          "#{way.id}-#{action.id}",
+                name:        action.name,
+                description: action.description,
+                execution:   "way/#{way.id}/#{action.id}"
+              }
+            end
+          end.flatten.compact.uniq,
+          executions: ways.collect do |_,way|
+            way.actions.collect do |_,action|
+              {
+                action:      "#{way.id}-#{action.id}",
+                id:          "way/#{way.id}/#{action.id}"
+              }
+            end   # empty execution so action will not be executed until clicked
+          end.flatten.compact.uniq
         }
       )
     end
@@ -158,33 +178,26 @@ class Server < Sinatra::Application
     content_type :json
     if location.children.include? owner_type.to_sym
       owner = location.send( owner_type, owner_id.to_sym )
-      result = owner.action( action_id.to_sym ).execute
-      # extract client-related info from execution hash
-      if result[:execution].kind_of?( Hash )
-        result[:changes] = result[:execution][:changes] ? Array(result[:execution][:changes]) : []
-        # todo: detect location change in #execute
-        if result[:execution][:location]
-          session[:location_id] = result[:execution][:location]
-          result[:changes] << :location
-        end
+      execution = owner.action( action_id.to_sym ).execute
+      if execution[:result][:location]
+        session[:location_id] = execution[:result][:location]
       end
-      result.delete :execution # execution info is for server only, do not pass to client
-      result[:id] = "#{owner_type}/#{owner_id}/#{action_id}" 
-      result[:action] = action_id
+      execution[:id] = "#{owner_type}/#{owner_id}/#{action_id}" 
+      execution[:action] = "#{owner_id}-#{action_id}"
       json(
         {
-          executions: result
+          executions: execution
         }
       )
     end
   end
 
-  get '/go/*' do |way_id|
-    content_type :json
-    way = world.locations[session[:location_id]].ways[way_id.to_sym]
-    session[:location_id] = way.to.id if way.open?
-    way.go.to_json
-  end
+  # get '/go/*' do |way_id|
+  #   content_type :json
+  #   way = world.locations[session[:location_id]].ways[way_id.to_sym]
+  #   session[:location_id] = way.to.id if way.open?
+  #   way.go.to_json
+  # end
 
 end
 

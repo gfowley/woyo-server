@@ -11,9 +11,6 @@ App.IndexRoute = Ember.Route.extend({
 
 App.Router.map(function() {
   this.resource('location', { path: '/location/:location_id' }); //, function() {
-    // this.resource('items', { path: '/items' });
-    // this.resource('ways', { path: '/ways' });
-  // });
 });
 
 // location
@@ -72,7 +69,9 @@ App.WayView = Ember.View.extend({
 App.Way = DS.Model.extend({
   location:     DS.belongsTo('location'),
   name:         DS.attr(),
-  description:  DS.attr()
+  description:  DS.attr(),
+  actions:      DS.hasMany('action', {async:false}),
+  div_id:       function() { return 'way-' + this.get('id'); }.property('id')
 });
 
 // item
@@ -123,38 +122,57 @@ App.Item = DS.Model.extend({
 App.ActionController = Ember.ObjectController.extend({
   actions: {
     execute: function() {
-      var that = this;
       this.get( 'execution' ).reload().then( function( execution ) {
-        that.handle_execution( execution );
-      }).then( function( execution) {
-      });
-    }
-  },
-  handle_execution: function( execution ) {
-    var changes       = execution.get( 'changes' );
-    var exec_action   = execution.get( 'action' );
-    var exec_item     = exec_action.get( 'item' );
-    var location      = exec_item.get( 'location' );
-    for ( type in changes ) {
-      if ( type == "item" ) {
-        var items_changed = changes.item;
-        for ( item_id in items_changed ) {
-          var item = location.get( 'items' ).findProperty( 'id', item_id );
-          if ( item ) {
-            attrs_changed = items_changed[item_id];
-            for ( attr_id in attrs_changed ) {
-              var attr = item.get(attr_id);
-              if ( attr ) {
-                // howto set transitions for ember bound fields ?
-                item.set( attr_id, attrs_changed[attr_id] );
+        var changes   = execution.get('changes');
+        var result    = execution.get('result')
+        var action    = execution.get('action');
+        var owner     = action.get('owner');
+        var location  = owner.get('location');
+        // todo: make this work for all changes...
+        // todo: transitions for changes to ember bound fields ?
+        for ( change in changes ) {
+          if ( change == "description" || change == "name" ) {
+            location.set( change, changes[change] );
+          }
+          if ( change == "item" ) {
+            var items_changed = changes.item;
+            for ( item_id in items_changed ) {
+              var item = location.get( 'items' ).findProperty( 'id', item_id );
+              if ( item ) {
+                attrs_changed = items_changed[item_id];
+                for ( attr_id in attrs_changed ) {
+                  var attr = item.get(attr_id);
+                  if ( attr ) {
+                    item.set( attr_id, attrs_changed[attr_id] );
+                  };
+                };
+              };
+            };
+          };
+          if ( change == "way" ) {
+            var ways_changed = changes.way;
+            for ( way_id in ways_changed ) {
+              var way = location.get( 'ways' ).findProperty( 'id', way_id );
+              if ( way ) {
+                attrs_changed = ways_changed[way_id];
+                for ( attr_id in attrs_changed ) {
+                  var attr = way.get(attr_id);
+                  if ( attr ) {
+                    way.set( attr_id, attrs_changed[attr_id] );
+                  };
+                };
               };
             };
           };
         };
-      };
-    };
-    setTimeout(function(){ execution.set( 'describe', '' ); }, woyo.time.action_delay);
-  }
+        if ( result.location ) {
+          setTimeout(function(){ window.location.assign("/play"); }, woyo.time.go_delay);
+        } else { 
+          setTimeout(function(){ execution.set( 'display_describe', null ); }, woyo.time.action_delay);
+        };
+      }); 
+    }
+  }  
 });
 
 App.ActionView = Ember.View.extend({
@@ -174,9 +192,12 @@ App.ActionView = Ember.View.extend({
 
 App.Action = DS.Model.extend({
   item:         DS.belongsTo('item'),
+  way:          DS.belongsTo('way'),
   name:         DS.attr(),
   description:  DS.attr(),
-  execution:    DS.belongsTo('execution', {async:false})
+  execution:    DS.belongsTo('execution', {async:false}),
+  owner: function() { return this.get('item') || this.get('way'); }.property('item','way'),
+  display_description: function() { return this.get('description') || this.get('name'); }.property('description','way')
 });
 
 // execution
@@ -203,7 +224,16 @@ App.Execution = DS.Model.extend({
   action:       DS.belongsTo('action'),
   result:       DS.attr(),
   describe:     DS.attr(),
-  changes:      DS.attr()
+  changes:      DS.attr(),
+  display_describe: function(key, value, old) {
+    // computed property to display describe lets me erase the displayed value without making the record dirty
+    // a clean record permits reload from the server for subsequent action executions
+    if ( arguments.length == 1 ) {
+      return this.get('describe');
+    } else {
+      return value;
+    }
+  }.property('describe')
 });
 
 // functions
@@ -213,40 +243,4 @@ function hold(delay_time){
   setTimeout(function(){ dfd.resolve(); }, delay_time);
   return dfd.promise();
 }
-
-$(document).ready( function() {
-
-  $("a.do").click( function() {
-    owner = $("#" + $(this).parent().attr("owner_element"));
-    $.getJSONj( $(this).attr("href") ).then(
-      function(json) {
-        // todo: handle multiple texts in describe array not just a string
-        if ( json.describe.length > 0 ) {
-          owner
-          .children(".describe-actions")
-          .text(json.describe)
-          .slideDown(woyo.time.go_slide)
-          .animate({opacity: 1}, woyo.time.go_fade)
-          .delay(woyo.time.go_delay)
-          .queue( function(next) {
-          if ( json.changes.length > 0 ) {
-              $("body").fadeOut(woyo.time.page_out, function() {
-                window.location.reload(true);
-              });
-            };
-            next();
-          });
-        } else {
-          if ( json.changes.length > 0 ) {
-            $("body").fadeOut(woyo.time.page_out, function() {
-              window.location.reload(true);
-            });
-          };
-        };
-      }
-    ); 
-    return false;
-  });
-
-});
 
