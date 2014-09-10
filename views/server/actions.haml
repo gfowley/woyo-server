@@ -1,6 +1,0 @@
-%ul.actions
-  - owner_type = owner.class.name.split('::').last.downcase
-  - owner.actions.names.each do |action|
-    %li.action{ :id => "action-#{owner_type}-#{owner.id}-#{action}", :owner_element => "#{owner_type}-#{owner.id}" }
-      %a.do{ :id => "do-#{owner_type}-#{owner.id}-#{action}", :href => "/do/#{owner_type}/#{owner.id}/#{action}" }
-        %span.name= action
