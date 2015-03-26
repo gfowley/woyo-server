@@ -1,17 +1,14 @@
-require 'pry'
-#require 'pry-rescue'
-require 'rack/test'
-ENV['RACK_ENV'] = 'test'
+# Volt sets up rspec and capybara for testing.
+require 'volt/spec/setup'
+Volt.spec_setup
 
-require 'capybara/rspec'
-Capybara.app = Woyo::Server
-Capybara.ignore_hidden_elements = false
-#Capybara.default_driver = :selenium #:rack_test
+RSpec.configure do |config|
+  config.run_all_when_everything_filtered = true
+  config.filter_run :focus
 
-module RSpecMixin
-  include Rack::Test::Methods
-  def app() Woyo::Server end
+  # Run specs in random order to surface order dependencies. If you find an
+  # order dependency and want to debug it, you can fix the order by providing
+  # the seed, which is printed after each run.
+  #     --seed 1234
+  config.order = 'random'
 end
-
-RSpec.configure { |c| c.include RSpecMixin }
-
