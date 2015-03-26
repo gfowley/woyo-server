@@ -22,4 +22,5 @@ tmp
 *.a
 mkmf.log
 capybara-*.html
+*.un~
 
